@@ -34,30 +34,25 @@ function parseSheet(sheet: XLSX.Sheet): Schedule {
 	for (let c = 0; c < sheet["!data"][headerRow].length; c++) {
 		const cell = sheet["!data"][headerRow][c];
 		switch (cell.v) {
-			case "Course Listing": {
+			case "Course Listing":
 				courseListingColumn = c;
 				break;
-			}
 
-			case "Instructional Format": {
+			case "Instructional Format":
 				instructionalFormatColumn = c;
 				break;
-			}
 
-			case "Meeting Patterns": {
+			case "Meeting Patterns":
 				meetingPatternsColumn = c;
 				break;
-			}
 
-			case "Start Date": {
+			case "Start Date":
 				startDateColumn = c;
 				break;
-			}
 
-			case "End Date": {
+			case "End Date":
 				endDateColumn = c;
 				break;
-			}
 
 			default:
 				break;
