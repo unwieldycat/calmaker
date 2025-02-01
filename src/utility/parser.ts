@@ -59,7 +59,6 @@ function parseSheet(sheet: XLSX.Sheet): Schedule {
 		}
 	}
 
-	// TODO: Find appropriate columns for each piece of information
 	// TODO: For each row of information, create a new section
 	// TODO: Format event name as "{Course ID} {Instructional Format}"
 	// TODO: Extract meeting pattern, start time, end time, and location from "Meeting Patterns" column
