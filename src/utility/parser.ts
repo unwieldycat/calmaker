@@ -23,8 +23,46 @@ function parseSheet(sheet: XLSX.Sheet): Schedule {
 			break;
 		}
 	}
-
 	if (!headerRow) throw new ParseError("Unable to find the header row");
+
+	let courseListingColumn,
+		meetingPatternsColumn,
+		instructionalFormatColumn,
+		startDateColumn,
+		endDateColumn;
+
+	for (let c = 0; c < sheet["!data"][headerRow].length; c++) {
+		const cell = sheet["!data"][headerRow][c];
+		switch (cell.v) {
+			case "Course Listing": {
+				courseListingColumn = c;
+				break;
+			}
+
+			case "Instructional Format": {
+				instructionalFormatColumn = c;
+				break;
+			}
+
+			case "Meeting Patterns": {
+				meetingPatternsColumn = c;
+				break;
+			}
+
+			case "Start Date": {
+				startDateColumn = c;
+				break;
+			}
+
+			case "End Date": {
+				endDateColumn = c;
+				break;
+			}
+
+			default:
+				break;
+		}
+	}
 
 	// TODO: Find appropriate columns for each piece of information
 	// TODO: For each row of information, create a new section
