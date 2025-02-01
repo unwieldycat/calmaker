@@ -25,6 +25,7 @@ function parseSheet(sheet: XLSX.Sheet): Schedule {
 	}
 	if (!headerRow) throw new ParseError("Unable to find the header row");
 
+	// Find the columns for each piece of data
 	let courseListingColumn,
 		meetingPatternsColumn,
 		instructionalFormatColumn,
