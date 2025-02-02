@@ -1,5 +1,6 @@
 import { ChangeEvent, useState } from "react";
 import XLSX from "xlsx";
+import { parseSheet } from "../utility/parser";
 import "./App.css";
 
 function App() {
@@ -17,7 +18,13 @@ function App() {
 		if (!file) return;
 
 		file.text().then((data) => {
-			const book = XLSX.read(data, { type: "buffer" });
+			const book = XLSX.read(data, { type: "buffer", dense: true });
+			const sheet = book.Sheets[book.SheetNames[0]];
+			try {
+				parseSheet(sheet);
+			} catch (e) {
+				console.error(e);
+			}
 		});
 	};
 
