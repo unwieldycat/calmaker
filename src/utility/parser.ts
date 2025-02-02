@@ -1,7 +1,7 @@
 import XLSX from "xlsx";
 import { Schedule } from "./schedule";
 
-class ParseError extends Error {
+export class ParseError extends Error {
 	constructor(message: string) {
 		super(message);
 		this.name = "ParseError";
@@ -9,7 +9,7 @@ class ParseError extends Error {
 	}
 }
 
-function parseSheet(sheet: XLSX.Sheet): Schedule {
+export function parseSheet(sheet: XLSX.Sheet): Schedule {
 	if (!sheet["!data"]) throw new ParseError("Sheet is empty");
 
 	// Find the row of the column headers for each piece of data,
