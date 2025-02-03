@@ -17,8 +17,8 @@ function App() {
 	const onStartPressed = () => {
 		if (!file) return;
 
-		file.text().then((data) => {
-			const book = XLSX.read(data, { type: "buffer", dense: true });
+		file.arrayBuffer().then((data) => {
+			const book = XLSX.read(data, { type: "array", dense: true });
 			const sheet = book.Sheets[book.SheetNames[0]];
 			try {
 				parseSheet(sheet);
