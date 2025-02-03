@@ -9,16 +9,16 @@ export class ParseError extends Error {
 	}
 }
 
-export function parseSheet(sheet: XLSX.Sheet): Schedule {
-	if (!sheet["!data"]) throw new ParseError("Sheet is empty");
+export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
+	const sheetData: string[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
 	// Find the row of the column headers for each piece of data,
 	// since variations of the spreadsheet exist where this can be in
 	// different places
 	let headerRow;
-	for (let r = 0; r < sheet["!data"].length; r++) {
-		const row = sheet["!data"][r];
-		if (row[0].v === "My Enrolled Courses") {
+	for (let r = 0; r < sheetData.length; r++) {
+		const row = sheetData[r];
+		if (row[0] === "My Enrolled Courses") {
 			headerRow = r + 2;
 			break;
 		}
@@ -32,9 +32,9 @@ export function parseSheet(sheet: XLSX.Sheet): Schedule {
 		startDateColumn,
 		endDateColumn;
 
-	for (let c = 0; c < sheet["!data"][headerRow].length; c++) {
-		const cell = sheet["!data"][headerRow][c];
-		switch (cell.v) {
+	for (let c = 0; c < sheetData[headerRow].length; c++) {
+		const cell = sheetData[headerRow][c];
+		switch (cell) {
 			case "Course Listing":
 				courseListingColumn = c;
 				break;
