@@ -12,6 +12,14 @@ export class ParseError extends Error {
 	}
 }
 
+enum Columns {
+	COURSE_LISTING = "Course Listing",
+	INSTRUCTIONAL_FORMAT = "Instructional Format",
+	MEETING_PATTERNS = "Meeting Patterns",
+	START_DATE = "Start Date",
+	END_DATE = "End Date",
+}
+
 /**
  * Find the header row in the sheet data
  * @param sheetData 2D array of strings representing the sheet data
@@ -31,6 +39,32 @@ function findHeaderRow(sheetData: string[][]): number {
 }
 
 /**
+ * Find the provided columns
+ * @param headerRow Header row index
+ * @param headerNames Array of header names
+ * @param sheetData 2D array of strings representing the sheet data
+ * @returns Data column indexes
+ */
+function findColumns(
+	headerNames: string[],
+	headerRow: number,
+	sheetData: string[][]
+): Record<string, number> {
+	const columns: Record<string, number> = {};
+
+	for (const name of headerNames) {
+		const index = sheetData[headerRow].indexOf(name);
+		if (index === -1) {
+			throw new ParseError(`Unable to find the ${name} column`);
+		} else {
+			columns[name] = index;
+		}
+	}
+
+	return columns;
+}
+
+/**
  * Parse a sheet into a schedule
  * @param sheet XLSX Worksheet to parse
  * @returns A schedule object
@@ -38,40 +72,21 @@ function findHeaderRow(sheetData: string[][]): number {
 export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
 	const sheetData: string[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 	const headerRow = findHeaderRow(sheetData);
+	const dataColumns = findColumns(
+		[
+			Columns.COURSE_LISTING,
+			Columns.INSTRUCTIONAL_FORMAT,
+			Columns.MEETING_PATTERNS,
+			Columns.START_DATE,
+			Columns.END_DATE,
+		],
+		headerRow,
+		sheetData
+	);
 
-	// Find the columns for each piece of data
-	let courseListingColumn,
-		meetingPatternsColumn,
-		instructionalFormatColumn,
-		startDateColumn,
-		endDateColumn;
-
-	for (let c = 0; c < sheetData[headerRow].length; c++) {
-		const cell = sheetData[headerRow][c];
-		switch (cell) {
-			case "Course Listing":
-				courseListingColumn = c;
-				break;
-
-			case "Instructional Format":
-				instructionalFormatColumn = c;
-				break;
-
-			case "Meeting Patterns":
-				meetingPatternsColumn = c;
-				break;
-
-			case "Start Date":
-				startDateColumn = c;
-				break;
-
-			case "End Date":
-				endDateColumn = c;
-				break;
-
-			default:
-				break;
-		}
+	for (let r = headerRow + 1; r < sheetData.length; r++) {
+		const row = sheetData[r];
+		if (row[dataColumns[Columns.COURSE_LISTING]] === undefined) continue;
 	}
 
 	// TODO: For each row of information, create a new section
