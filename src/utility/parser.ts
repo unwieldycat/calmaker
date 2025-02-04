@@ -1,6 +1,6 @@
 import XLSX from "xlsx";
 import { Schedule, Section } from "./schedule";
-import { WeekdayNumbers } from "luxon";
+import { DateTime, Duration, WeekdayNumbers } from "luxon";
 
 /**
  * Error thrown when parsing fails
@@ -19,6 +19,7 @@ enum Columns {
 	MEETING_PATTERNS = "Meeting Patterns",
 	START_DATE = "Start Date",
 	END_DATE = "End Date",
+	INSTRUCTOR = "Instructor",
 }
 
 /**
@@ -80,6 +81,7 @@ export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
 			Columns.MEETING_PATTERNS,
 			Columns.START_DATE,
 			Columns.END_DATE,
+			Columns.INSTRUCTOR,
 		],
 		headerRow,
 		sheetData
@@ -99,6 +101,12 @@ export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
 
 		const courseId = courseName.split("-")[0].trim();
 		const format = row[dataColumns[Columns.INSTRUCTIONAL_FORMAT]];
+		let description = courseName[1].trim();
+
+		const instructor = row[dataColumns[Columns.INSTRUCTOR]];
+		if (instructor && typeof instructor == "string") {
+			description += ` with ${instructor}`;
+		}
 
 		const meetingPatterns = row[dataColumns[Columns.MEETING_PATTERNS]];
 		if (typeof meetingPatterns != "string")
@@ -122,15 +130,18 @@ export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
 		if (!(endDate instanceof Date))
 			throw new ParseError("endDate is not a Date");
 
-		// schedule.addSection({
-		// 	name: `${courseId} ${format}`,
-		// 	location,
-		// 	days,
-		// });
+		schedule.addSection({
+			name: `${courseId} ${format}`,
+			description,
+			location,
+			days,
+			duration: Duration.fromDurationLike(0),
+			start: DateTime.fromJSDate(startDate),
+			end: DateTime.fromJSDate(endDate),
+		});
 	}
 
-	// TODO: Format event name as "{Course ID} {Instructional Format}"
-	// TODO: Extract meeting pattern, start time, end time, and location from "Meeting Patterns" column
+	console.log(schedule);
 
 	return new Schedule();
 }
