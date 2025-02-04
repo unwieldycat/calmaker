@@ -1,6 +1,5 @@
 import XLSX from "xlsx";
-import { Schedule, Section } from "./schedule";
-import { DateTime, Duration, WeekdayNumbers } from "luxon";
+import { Schedule, Section, Weekdays } from "./schedule";
 
 /**
  * Error thrown when parsing fails
@@ -119,7 +118,7 @@ export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
 			.trim()
 			.split("-")
 			.map((letter) => ["M", "T", "W", "R", "F"].indexOf(letter) + 2)
-			.map((n) => n as WeekdayNumbers);
+			.map((n) => n);
 
 		const location = splitted[2].trim();
 
@@ -135,9 +134,9 @@ export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
 			description,
 			location,
 			days,
-			duration: Duration.fromDurationLike(0),
-			start: DateTime.fromJSDate(startDate),
-			end: DateTime.fromJSDate(endDate),
+			start: startDate,
+			end: startDate,
+			lastDate: endDate,
 		});
 	}
 
