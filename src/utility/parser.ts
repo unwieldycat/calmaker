@@ -1,5 +1,6 @@
 import XLSX from "xlsx";
-import { Schedule } from "./schedule";
+import { Schedule, Section } from "./schedule";
+import { WeekdayNumbers } from "luxon";
 
 /**
  * Error thrown when parsing fails
@@ -92,30 +93,29 @@ export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
 
 		const courseName = row[dataColumns[Columns.COURSE_LISTING]];
 		const courseId = courseName.split("-")[0].trim();
-		console.log(courseId);
 
 		const format = row[dataColumns[Columns.INSTRUCTIONAL_FORMAT]];
-		console.log(format);
 
 		const meetingPatterns = row[dataColumns[Columns.MEETING_PATTERNS]];
 		const splitted = meetingPatterns.split("|");
 		const days = splitted[0]
 			.trim()
 			.split("-")
-			.map((letter) => {
-				return ["M", "T", "W", "R", "F"].indexOf(letter) + 2;
-			});
+			.map((letter) => ["M", "T", "W", "R", "F"].indexOf(letter) + 2)
+			.map((n) => n as WeekdayNumbers);
 
-		console.log(days);
+		const location = splitted[2].trim();
 
 		const startDate = row[dataColumns[Columns.START_DATE]];
-		console.log(startDate);
-
 		const endDate = row[dataColumns[Columns.END_DATE]];
-		console.log(endDate);
+
+		// schedule.addSection({
+		// 	name: `${courseId} ${format}`,
+		// 	location,
+		// 	days,
+		// });
 	}
 
-	// TODO: For each row of information, create a new section
 	// TODO: Format event name as "{Course ID} {Instructional Format}"
 	// TODO: Extract meeting pattern, start time, end time, and location from "Meeting Patterns" column
 
