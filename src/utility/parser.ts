@@ -66,6 +66,22 @@ function findColumns(
 }
 
 /**
+ * Parse sheet time string into hours and minutes
+ * @param time Time string in the format "hh:mm AM/PM"
+ * @returns
+ */
+function parseTimeString(time: string): [number, number] {
+	const matches = time.match(/(\d{1,2}):(\d{1,2}) (AM|PM)/);
+	if (!matches) throw new ParseError("Failed to parse time string: " + time);
+
+	let hours = parseInt(matches[1]);
+	let minutes = parseInt(matches[2]);
+	if (matches[3] === "PM") hours += 12;
+
+	return [hours, minutes];
+}
+
+/**
  * Parse a sheet into a schedule
  * @param sheet XLSX Worksheet to parse
  * @returns A schedule object
@@ -120,14 +136,28 @@ export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
 			.map((letter) => ["M", "T", "W", "R", "F"].indexOf(letter) + 2)
 			.map((n) => n);
 
+		const timeString = splitted[1].trim();
+
+		const startTime = parseTimeString(timeString.split("-")[0].trim());
+		const endTime = parseTimeString(timeString.split("-")[1].trim());
+
 		const location = splitted[2].trim();
 
 		const startDate = row[dataColumns[Columns.START_DATE]];
-		const endDate = row[dataColumns[Columns.END_DATE]];
+		const lastDate = row[dataColumns[Columns.END_DATE]];
 		if (!(startDate instanceof Date))
 			throw new ParseError("startDate is not a Date");
-		if (!(endDate instanceof Date))
-			throw new ParseError("endDate is not a Date");
+		if (!(lastDate instanceof Date))
+			throw new ParseError("lastDate is not a Date");
+
+		startDate.setHours(startTime[0]);
+		startDate.setMinutes(startTime[1]);
+		startDate.setSeconds(0);
+
+		const endDate = new Date(startDate);
+		endDate.setHours(endTime[0]);
+		endDate.setMinutes(endTime[1]);
+		endDate.setSeconds(0);
 
 		schedule.addSection({
 			name: `${courseId} ${format}`,
@@ -135,8 +165,8 @@ export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
 			location,
 			days,
 			start: startDate,
-			end: startDate,
-			lastDate: endDate,
+			end: endDate,
+			lastDate: lastDate,
 		});
 	}
 
