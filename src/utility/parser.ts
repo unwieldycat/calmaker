@@ -86,7 +86,7 @@ function parseTimeString(time: string): [number, number] {
  * @param sheet XLSX Worksheet to parse
  * @returns A schedule object
  */
-export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
+export async function parseSheet(sheet: XLSX.WorkSheet): Promise<Schedule> {
 	const sheetData: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 	const headerRow = findHeaderRow(sheetData);
 	const dataColumns = findColumns(
