@@ -116,7 +116,7 @@ export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
 
 		const courseId = courseName.split("-")[0].trim();
 		const format = row[dataColumns[Columns.INSTRUCTIONAL_FORMAT]];
-		let description = courseName[1].trim();
+		let description = courseName.split("-")[1].trim();
 
 		const instructor = row[dataColumns[Columns.INSTRUCTOR]];
 		if (instructor && typeof instructor == "string") {
