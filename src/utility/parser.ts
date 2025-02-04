@@ -84,9 +84,35 @@ export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
 		sheetData
 	);
 
+	const schedule = new Schedule();
+
 	for (let r = headerRow + 1; r < sheetData.length; r++) {
 		const row = sheetData[r];
-		if (row[dataColumns[Columns.COURSE_LISTING]] === undefined) continue;
+		if (row[0] === "My Dropped/Withdrawn Courses") break;
+
+		const courseName = row[dataColumns[Columns.COURSE_LISTING]];
+		const courseId = courseName.split("-")[0].trim();
+		console.log(courseId);
+
+		const format = row[dataColumns[Columns.INSTRUCTIONAL_FORMAT]];
+		console.log(format);
+
+		const meetingPatterns = row[dataColumns[Columns.MEETING_PATTERNS]];
+		const splitted = meetingPatterns.split("|");
+		const days = splitted[0]
+			.trim()
+			.split("-")
+			.map((letter) => {
+				return ["M", "T", "W", "R", "F"].indexOf(letter) + 2;
+			});
+
+		console.log(days);
+
+		const startDate = row[dataColumns[Columns.START_DATE]];
+		console.log(startDate);
+
+		const endDate = row[dataColumns[Columns.END_DATE]];
+		console.log(endDate);
 	}
 
 	// TODO: For each row of information, create a new section
