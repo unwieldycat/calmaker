@@ -26,7 +26,7 @@ enum Columns {
  * @param sheetData 2D array of strings representing the sheet data
  * @returns Header row index
  */
-function findHeaderRow(sheetData: string[][]): number {
+function findHeaderRow(sheetData: unknown[][]): number {
 	let headerRow;
 	for (let r = 0; r < sheetData.length; r++) {
 		const row = sheetData[r];
@@ -49,7 +49,7 @@ function findHeaderRow(sheetData: string[][]): number {
 function findColumns(
 	headerNames: string[],
 	headerRow: number,
-	sheetData: string[][]
+	sheetData: unknown[][]
 ): Record<string, number> {
 	const columns: Record<string, number> = {};
 
@@ -71,7 +71,7 @@ function findColumns(
  * @returns A schedule object
  */
 export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
-	const sheetData: string[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+	const sheetData: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 	const headerRow = findHeaderRow(sheetData);
 	const dataColumns = findColumns(
 		[
@@ -92,11 +92,20 @@ export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
 		if (row[0] === "My Dropped/Withdrawn Courses") break;
 
 		const courseName = row[dataColumns[Columns.COURSE_LISTING]];
-		const courseId = courseName.split("-")[0].trim();
+		if (typeof courseName != "string")
+			throw new ParseError(
+				"courseName: Expected string, got " + typeof courseName
+			);
 
+		const courseId = courseName.split("-")[0].trim();
 		const format = row[dataColumns[Columns.INSTRUCTIONAL_FORMAT]];
 
 		const meetingPatterns = row[dataColumns[Columns.MEETING_PATTERNS]];
+		if (typeof meetingPatterns != "string")
+			throw new ParseError(
+				"meetingPatterns: Expected string, got " + typeof meetingPatterns
+			);
+
 		const splitted = meetingPatterns.split("|");
 		const days = splitted[0]
 			.trim()
@@ -108,6 +117,10 @@ export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
 
 		const startDate = row[dataColumns[Columns.START_DATE]];
 		const endDate = row[dataColumns[Columns.END_DATE]];
+		if (!(startDate instanceof Date))
+			throw new ParseError("startDate is not a Date");
+		if (!(endDate instanceof Date))
+			throw new ParseError("endDate is not a Date");
 
 		// schedule.addSection({
 		// 	name: `${courseId} ${format}`,
