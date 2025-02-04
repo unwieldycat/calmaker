@@ -24,11 +24,12 @@ function App() {
 				cellDates: true,
 			});
 			const sheet = book.Sheets[book.SheetNames[0]];
-			try {
-				parseSheet(sheet);
-			} catch (e) {
-				console.error(e);
-			}
+
+			parseSheet(sheet)
+				.then((schedule) => schedule)
+				.catch((e) => console.error(e));
+
+			// TODO: Convert the schedule to ICS and create a download for it
 		});
 	};
 
