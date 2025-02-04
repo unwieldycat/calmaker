@@ -170,7 +170,5 @@ export function parseSheet(sheet: XLSX.WorkSheet): Schedule {
 		});
 	}
 
-	console.log(schedule);
-
-	return new Schedule();
+	return schedule;
 }
