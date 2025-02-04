@@ -18,7 +18,11 @@ function App() {
 		if (!file) return;
 
 		file.arrayBuffer().then((data) => {
-			const book = XLSX.read(data, { type: "array", dense: true });
+			const book = XLSX.read(data, {
+				type: "array",
+				dense: true,
+				cellDates: true,
+			});
 			const sheet = book.Sheets[book.SheetNames[0]];
 			try {
 				parseSheet(sheet);
