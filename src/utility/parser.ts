@@ -26,7 +26,7 @@ enum Columns {
  * @param sheetData 2D array of strings representing the sheet data
  * @returns Header row index
  */
-function findHeaderRow(sheetData: unknown[][]): number {
+export function findHeaderRow(sheetData: unknown[][]): number {
 	let headerRow;
 	for (let r = 0; r < sheetData.length; r++) {
 		const row = sheetData[r];
@@ -46,12 +46,14 @@ function findHeaderRow(sheetData: unknown[][]): number {
  * @param sheetData 2D array of strings representing the sheet data
  * @returns Data column indexes
  */
-function findColumns(
+export function findColumns(
 	headerNames: string[],
 	headerRow: number,
 	sheetData: unknown[][]
 ): Record<string, number> {
 	const columns: Record<string, number> = {};
+	if (sheetData.length <= headerRow)
+		throw new Error("Invalid header row index");
 
 	for (const name of headerNames) {
 		const index = sheetData[headerRow].indexOf(name);
