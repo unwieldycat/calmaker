@@ -35,6 +35,7 @@ function App() {
 
 	return (
 		<>
+			<h1>Convert your WPI Workday schedule to ICS</h1>
 			<div className="btn-container">
 				<input
 					accept=".xlsx"
