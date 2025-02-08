@@ -72,7 +72,7 @@ export function findColumns(
  * @param time Time string in the format "hh:mm AM/PM"
  * @returns
  */
-function parseTimeString(time: string): [number, number] {
+export function parseTimeString(time: string): [number, number] {
 	const matches = time.match(/(\d{1,2}):(\d{1,2}) (AM|PM)/);
 	if (!matches) throw new ParseError("Failed to parse time string: " + time);
 
