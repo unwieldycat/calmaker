@@ -94,6 +94,7 @@ export function parseTimeString(time: string): [number, number] {
  * @returns A schedule object
  */
 export async function parseSheet(sheet: XLSX.WorkSheet): Promise<Schedule> {
+	// FIXME: sheet_to_json gives bad output with certain formats of the sheet
 	const sheetData: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 	const headerRow = findHeaderRow(sheetData);
 	const dataColumns = findColumns(
