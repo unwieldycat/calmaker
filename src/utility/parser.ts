@@ -110,7 +110,7 @@ function parseMeetingPattern(patternCell: unknown) {
 	const days = splitted[0]
 		.trim()
 		.split("-")
-		.map((letter) => ["M", "T", "W", "R", "F"].indexOf(letter) + 2)
+		.map((letter) => ["M", "T", "W", "R", "F"].indexOf(letter) + 1)
 		.map((n) => n)
 		.sort((a, b) => a - b) as Weekdays[];
 

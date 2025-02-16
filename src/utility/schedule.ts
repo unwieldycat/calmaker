@@ -59,9 +59,9 @@ export class Schedule {
 		const events: CalendarOptions[] = [];
 
 		for (const section of this._sections) {
-			const weekdays = section.days
-				.map((day) => day - 1)
-				.map((id) => ["SU", "MO", "TU", "WE", "TH", "FR", "SA"][id]);
+			const weekdays = section.days.map(
+				(id) => ["SU", "MO", "TU", "WE", "TH", "FR", "SA"][id]
+			);
 
 			const event: CalendarOptions = {
 				title: section.name,
