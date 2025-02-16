@@ -183,20 +183,19 @@ export async function parseSheet(sheet: XLSX.WorkSheet): Promise<Schedule> {
 		const endDate = new Date(startDate);
 		addTimeToDate(endDate, endTime);
 
+		// FIXME: Some sections are 2 hours when they're supposed to be 1 hour
+
 		for (const day of days) {
 			if (day >= startDate.getDay()) {
 				const diff = day - startDate.getDay();
 				if (diff !== 0) startDate.setDate(startDate.getDate() + diff);
 				break;
+			} else if (day < startDate.getDay()) {
+				const diff = 7 - startDate.getDay() + day;
+				startDate.setDate(startDate.getDate() + diff);
+				break;
 			}
 		}
-
-		// FIXME: Fix sections that start in the next week
-
-		// if (startDate.getDay() > days[0]) {
-		// 	const diff = days[0] - startDate.getDay();
-		// 	startDate.setDate(startDate.getDate() + diff + 7);
-		// }
 
 		schedule.addSection({
 			name: `${courseId} ${courseFormat}`,
