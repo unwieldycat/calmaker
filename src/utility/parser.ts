@@ -88,6 +88,47 @@ export function parseTimeString(time: string): [number, number] {
 	return [hours, minutes];
 }
 
+function parseCourseName(courseNameCell: unknown) {
+	if (typeof courseNameCell != "string")
+		throw new ParseError(
+			"courseName: Expected string, got " + typeof courseNameCell
+		);
+
+	const splitted = courseNameCell.split("-");
+	const courseId = splitted[0].trim();
+	const fullName = splitted[1].trim();
+	return [courseId, fullName] as const;
+}
+
+function parseMeetingPattern(patternCell: unknown) {
+	if (typeof patternCell != "string")
+		throw new ParseError(
+			"meetingPatterns: Expected string, got " + typeof patternCell
+		);
+
+	const splitted = patternCell.split("|");
+	const days = splitted[0]
+		.trim()
+		.split("-")
+		.map((letter) => ["M", "T", "W", "R", "F"].indexOf(letter) + 2)
+		.map((n) => n)
+		.sort((a, b) => a - b) as Weekdays[];
+
+	const timeString = splitted[1].trim();
+
+	const startTime = parseTimeString(timeString.split("-")[0].trim());
+	const endTime = parseTimeString(timeString.split("-")[1].trim());
+	const location = splitted[2].trim();
+
+	return [days, startTime, endTime, location] as const;
+}
+
+function addTimeToDate(date: Date, time: number[]) {
+	date.setHours(time[0]);
+	date.setMinutes(time[1]);
+	date.setSeconds(0);
+}
+
 /**
  * Parse a sheet into a schedule
  * @param sheet XLSX Worksheet to parse
@@ -116,41 +157,19 @@ export async function parseSheet(sheet: XLSX.WorkSheet): Promise<Schedule> {
 		const row = sheetData[r];
 		if (row[0] === "My Dropped/Withdrawn Courses") break;
 
-		const courseName = row[dataColumns[Columns.COURSE_LISTING]];
-		if (typeof courseName != "string")
-			throw new ParseError(
-				"courseName: Expected string, got " + typeof courseName
-			);
+		let [courseId, courseFullName] = parseCourseName(
+			row[dataColumns[Columns.COURSE_LISTING]]
+		);
 
-		const courseId = courseName.split("-")[0].trim();
-		const format = row[dataColumns[Columns.INSTRUCTIONAL_FORMAT]];
-		let description = courseName.split("-")[1].trim();
-
+		const courseFormat = row[dataColumns[Columns.INSTRUCTIONAL_FORMAT]];
 		const instructor = row[dataColumns[Columns.INSTRUCTOR]];
 		if (instructor && typeof instructor == "string") {
-			description += ` with ${instructor}`;
+			courseFullName += ` with ${instructor}`;
 		}
 
-		const meetingPatterns = row[dataColumns[Columns.MEETING_PATTERNS]];
-		if (typeof meetingPatterns != "string")
-			throw new ParseError(
-				"meetingPatterns: Expected string, got " + typeof meetingPatterns
-			);
-
-		const splitted = meetingPatterns.split("|");
-		const days = splitted[0]
-			.trim()
-			.split("-")
-			.map((letter) => ["M", "T", "W", "R", "F"].indexOf(letter) + 2)
-			.map((n) => n)
-			.sort((a, b) => a - b) as Weekdays[];
-
-		const timeString = splitted[1].trim();
-
-		const startTime = parseTimeString(timeString.split("-")[0].trim());
-		const endTime = parseTimeString(timeString.split("-")[1].trim());
-
-		const location = splitted[2].trim();
+		const [days, startTime, endTime, location] = parseMeetingPattern(
+			row[dataColumns[Columns.MEETING_PATTERNS]]
+		);
 
 		const startDate = row[dataColumns[Columns.START_DATE]];
 		const lastDate = row[dataColumns[Columns.END_DATE]];
@@ -159,14 +178,10 @@ export async function parseSheet(sheet: XLSX.WorkSheet): Promise<Schedule> {
 		if (!(lastDate instanceof Date))
 			throw new ParseError("lastDate is not a Date");
 
-		startDate.setHours(startTime[0]);
-		startDate.setMinutes(startTime[1]);
-		startDate.setSeconds(0);
+		addTimeToDate(startDate, startTime);
 
 		const endDate = new Date(startDate);
-		endDate.setHours(endTime[0]);
-		endDate.setMinutes(endTime[1]);
-		endDate.setSeconds(0);
+		addTimeToDate(endDate, endTime);
 
 		for (const day of days) {
 			if (day >= startDate.getDay()) {
@@ -184,8 +199,8 @@ export async function parseSheet(sheet: XLSX.WorkSheet): Promise<Schedule> {
 		// }
 
 		schedule.addSection({
-			name: `${courseId} ${format}`,
-			description,
+			name: `${courseId} ${courseFormat}`,
+			description: courseFullName,
 			location,
 			days,
 			start: startDate,
