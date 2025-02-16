@@ -142,7 +142,8 @@ export async function parseSheet(sheet: XLSX.WorkSheet): Promise<Schedule> {
 			.trim()
 			.split("-")
 			.map((letter) => ["M", "T", "W", "R", "F"].indexOf(letter) + 2)
-			.map((n) => n);
+			.map((n) => n)
+			.sort((a, b) => a - b) as Weekdays[];
 
 		const timeString = splitted[1].trim();
 
@@ -166,6 +167,21 @@ export async function parseSheet(sheet: XLSX.WorkSheet): Promise<Schedule> {
 		endDate.setHours(endTime[0]);
 		endDate.setMinutes(endTime[1]);
 		endDate.setSeconds(0);
+
+		for (const day of days) {
+			if (day >= startDate.getDay()) {
+				const diff = day - startDate.getDay();
+				if (diff !== 0) startDate.setDate(startDate.getDate() + diff);
+				break;
+			}
+		}
+
+		// FIXME: Fix sections that start in the next week
+
+		// if (startDate.getDay() > days[0]) {
+		// 	const diff = days[0] - startDate.getDay();
+		// 	startDate.setDate(startDate.getDate() + diff + 7);
+		// }
 
 		schedule.addSection({
 			name: `${courseId} ${format}`,
