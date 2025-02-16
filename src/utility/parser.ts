@@ -78,7 +78,12 @@ export function parseTimeString(time: string): [number, number] {
 
 	let hours = parseInt(matches[1]);
 	let minutes = parseInt(matches[2]);
-	if (matches[3] === "PM") hours += 12;
+	if (hours > 23 || minutes > 59 || (hours > 12 && matches[3] == "PM"))
+		throw new Error("Invalid time string");
+
+	// Convert to 24-hour time
+	if (matches[3] === "PM") hours = 12 + (hours % 12);
+	if (hours == 12 && matches[3] === "AM") hours = 0;
 
 	return [hours, minutes];
 }
