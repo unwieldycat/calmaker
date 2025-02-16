@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from "vitest";
-import { findColumns, ParseError } from "./parser";
+import { findColumns, ParseError, parseTimeString } from "./parser";
 
 describe("findColumns", async () => {
 	const sheetData = [
@@ -20,5 +20,31 @@ describe("findColumns", async () => {
 		expect(() => findColumns(["A"], 2, sheetData)).toThrow(
 			"Invalid header row index"
 		);
+	});
+});
+
+describe("parseTimeString", async () => {
+	it("should parse 12:00 AM", () => {
+		expect(parseTimeString("12:00 AM")).toEqual([0, 0]);
+	});
+
+	it("should parse 12:00 PM", () => {
+		expect(parseTimeString("12:00 PM")).toEqual([12, 0]);
+	});
+
+	it("should parse 1:30 PM", () => {
+		expect(parseTimeString("1:30 PM")).toEqual([13, 30]);
+	});
+
+	it("should parse 1:30 AM", () => {
+		expect(parseTimeString("1:30 AM")).toEqual([1, 30]);
+	});
+
+	it("should parse 11:59 PM", () => {
+		expect(parseTimeString("11:59 PM")).toEqual([23, 59]);
+	});
+
+	it("should error on invalid time", () => {
+		expect(() => parseTimeString("13:00 PM")).toThrow("Invalid time string");
 	});
 });
