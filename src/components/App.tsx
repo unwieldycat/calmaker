@@ -26,10 +26,13 @@ function App() {
 			const sheet = book.Sheets[book.SheetNames[0]];
 
 			parseSheet(sheet)
-				.then((schedule) => schedule)
+				.then((schedule) => {
+					const data = schedule.toICalendar().render();
+					const blob = new Blob([data], { type: "text/calendar" });
+					const url = URL.createObjectURL(blob);
+					window.open(url);
+				})
 				.catch((e) => console.error(e));
-
-			// TODO: Convert the schedule to ICS and create a download for it
 		});
 	};
 
