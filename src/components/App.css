@@ -1,8 +1,9 @@
 #root {
-	max-width: 1280px;
+	max-width: 512px;
 	margin: 0 auto;
 	padding: 2rem;
 	text-align: center;
+	font-family: Arial, Helvetica, sans-serif;
 }
 
 .btn-container {
@@ -11,4 +12,37 @@
 	justify-content: center;
 	align-items: center;
 	gap: 8px;
+}
+
+.btn {
+	padding: 8px 16px;
+	border: none;
+	border-radius: 4px;
+	background-color: #007bff;
+	color: #fff;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.btn:hover {
+	background-color: #006fe6;
+}
+
+.btn:disabled {
+	background-color: #80bdff;
+	cursor: not-allowed;
+}
+
+input[type="file"]::file-selector-button {
+	padding: 8px 16px;
+	border: 1px solid #e6e6e6;
+	border-radius: 4px;
+	background-color: #fff;
+	margin-right: 16px;
+	font-weight: bold;
+}
+
+input[type="file"]::file-selector-button:hover {
+	background-color: #f2f2f2;
+	cursor: pointer;
 }
