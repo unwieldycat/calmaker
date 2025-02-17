@@ -39,21 +39,24 @@ function App() {
 	return (
 		<>
 			<h1>Convert your WPI Workday schedule to ICS 🗓️</h1>
-			<div className="btn-container">
-				<input
-					accept=".xlsx"
-					type="file"
-					id="file-input"
-					onChange={onFileChange}
-				/>
-				<button
-					id="start"
-					className="btn"
-					disabled={file === null}
-					onClick={onStartPressed}
-				>
-					Start
-				</button>
+
+			<div className="controls-container">
+				<div className="btn-container">
+					<input
+						accept=".xlsx"
+						type="file"
+						id="file-input"
+						onChange={onFileChange}
+					/>
+					<button
+						id="start"
+						className="btn"
+						disabled={file === null}
+						onClick={onStartPressed}
+					>
+						Start
+					</button>
+				</div>
 			</div>
 		</>
 	);
