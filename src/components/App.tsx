@@ -58,6 +58,16 @@ function App() {
 					</button>
 				</div>
 			</div>
+			<div className="footer-container">
+				<div className="footer-row">
+					<p>This tool is not officially endorsed by WPI</p>
+				</div>
+				<div className="footer-row">
+					<p>© 2025 Thurston A Yates</p>
+					<p> • </p>
+					<a href="https://github.com/unwieldycat/calmaker">View Source</a>
+				</div>
+			</div>
 		</>
 	);
 }
