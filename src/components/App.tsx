@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from "react";
 import XLSX from "xlsx";
-import { parseSheet } from "../utility/parser";
+import { parseSheet } from "../logic/parser";
 import "./App.css";
 
 function App() {
