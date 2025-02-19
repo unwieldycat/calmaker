@@ -20,7 +20,8 @@
 .btn-container {
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
+	justify-content: space-between;
+	width: 100%;
 	align-items: center;
 	gap: 8px;
 }
@@ -35,12 +36,12 @@
 	cursor: pointer;
 }
 
-.btn:hover {
-	background-color: #006fe6;
+.btn:hover:enabled {
+	filter: brightness(125%);
 }
 
 .btn:disabled {
-	background-color: #80bdff;
+	opacity: 50%;
 	cursor: not-allowed;
 }
 
@@ -54,7 +55,7 @@ input[type="file"]::file-selector-button {
 }
 
 input[type="file"]::file-selector-button:hover {
-	background-color: #e6e6e6;
+	filter: brightness(125%);
 	cursor: pointer;
 }
 
@@ -72,20 +73,8 @@ input[type="file"]::file-selector-button:hover {
 		background-color: #0056b3;
 	}
 
-	.btn:hover {
-		background-color: #004c9a;
-	}
-
-	.btn:disabled {
-		background-color: #4d7fba;
-	}
-
 	input[type="file"]::file-selector-button {
 		background-color: #262626;
 		color: #fff;
-	}
-
-	input[type="file"]::file-selector-button:hover {
-		background-color: #333333;
 	}
 }
