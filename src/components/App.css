@@ -55,7 +55,7 @@ input[type="file"]::file-selector-button {
 }
 
 input[type="file"]::file-selector-button:hover {
-	filter: brightness(125%);
+	background-color: #e6e6e6;
 	cursor: pointer;
 }
 
@@ -76,5 +76,9 @@ input[type="file"]::file-selector-button:hover {
 	input[type="file"]::file-selector-button {
 		background-color: #262626;
 		color: #fff;
+	}
+
+	input[type="file"]::file-selector-button:hover {
+		background-color: #333333;
 	}
 }
