@@ -178,24 +178,26 @@ export async function parseSheet(sheet: XLSX.WorkSheet): Promise<Schedule> {
 		if (!(lastDate instanceof Date))
 			throw new ParseError("lastDate is not a Date");
 
-		addTimeToDate(startDate, startTime);
-
 		const endDate = new Date(startDate);
-		addTimeToDate(endDate, endTime);
-
-		// FIXME: Some sections are 2 hours when they're supposed to be 1 hour
 
 		for (const day of days) {
 			if (day >= startDate.getDay()) {
 				const diff = day - startDate.getDay();
-				if (diff !== 0) startDate.setDate(startDate.getDate() + diff);
+				if (diff !== 0) {
+					startDate.setDate(startDate.getDate() + diff);
+					endDate.setDate(endDate.getDate() + diff);
+				}
 				break;
 			} else if (day < startDate.getDay()) {
 				const diff = 7 - startDate.getDay() + day;
 				startDate.setDate(startDate.getDate() + diff);
+				endDate.setDate(endDate.getDate() + diff);
 				break;
 			}
 		}
+
+		addTimeToDate(startDate, startTime);
+		addTimeToDate(endDate, endTime);
 
 		schedule.addSection({
 			name: `${courseId} ${courseFormat}`,
