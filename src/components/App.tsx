@@ -50,7 +50,7 @@ function App() {
 					/>
 					<button
 						id="start"
-						className="btn"
+						className="primary button"
 						disabled={file === null}
 						onClick={onStartPressed}
 					>
