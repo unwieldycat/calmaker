@@ -12,6 +12,9 @@ export class ParseError extends Error {
 	}
 }
 
+/**
+ * Column names in the sheet
+ */
 enum Columns {
 	COURSE_LISTING = "Course Listing",
 	INSTRUCTIONAL_FORMAT = "Instructional Format",
@@ -88,6 +91,11 @@ export function parseTimeString(time: string): [number, number] {
 	return [hours, minutes];
 }
 
+/**
+ * Validate & parse the course name cell
+ * @param courseNameCell Cell data
+ * @returns Course ID and full name as strings
+ */
 function parseCourseName(courseNameCell: unknown) {
 	if (typeof courseNameCell != "string")
 		throw new ParseError(
@@ -100,6 +108,11 @@ function parseCourseName(courseNameCell: unknown) {
 	return [courseId, fullName] as const;
 }
 
+/**
+ * Validate & parse the meeting pattern cell
+ * @param patternCell Cell data
+ * @returns Days, startTime, endTime, and location
+ */
 function parseMeetingPattern(patternCell: unknown) {
 	if (typeof patternCell != "string")
 		throw new ParseError(
@@ -123,6 +136,11 @@ function parseMeetingPattern(patternCell: unknown) {
 	return [days, startTime, endTime, location] as const;
 }
 
+/**
+ * Add time array to date
+ * @param date Date
+ * @param time Time array [hours, minutes]
+ */
 function addTimeToDate(date: Date, time: number[]) {
 	date.setHours(time[0]);
 	date.setMinutes(time[1]);
@@ -155,6 +173,8 @@ export async function parseSheet(sheet: XLSX.WorkSheet): Promise<Schedule> {
 
 	for (let r = headerRow + 1; r < sheetData.length; r++) {
 		const row = sheetData[r];
+
+		// Stop parsing if the extended version of this sheet is reached
 		if (row[0] === "My Dropped/Withdrawn Courses") break;
 
 		let [courseId, courseFullName] = parseCourseName(
@@ -180,6 +200,8 @@ export async function parseSheet(sheet: XLSX.WorkSheet): Promise<Schedule> {
 
 		const endDate = new Date(startDate);
 
+		// Adjust the start date/end date so that the event falls on the first
+		// session of the section
 		for (const day of days) {
 			if (day >= startDate.getDay()) {
 				const diff = day - startDate.getDay();
