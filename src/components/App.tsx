@@ -40,7 +40,6 @@ function App() {
 	return (
 		<>
 			<h1>Convert your WPI Workday schedule to ICS 🗓️</h1>
-
 			<div className="controls box">
 				<input
 					accept=".xlsx"
@@ -50,7 +49,10 @@ function App() {
 				/>
 
 				<div className="btn-cluster">
-					<button id="config" className="icon button" disabled={file === null}>
+					<button className="icon button">
+						<FeatherIcon icon="info" size={20} />
+					</button>
+					<button className="icon button" disabled={file === null}>
 						<FeatherIcon icon="settings" size={20} />
 					</button>
 					<button
@@ -62,6 +64,27 @@ function App() {
 						<FeatherIcon icon="download" size={20} />
 					</button>
 				</div>
+			</div>
+
+			<div className="info box">
+				<h3>Instructions</h3>
+				<p>
+					Export your schedule from Workday and upload it here. You can export
+					your schedule from Workday by navigating to{" "}
+					<i>Academics {">"} View My Courses</i> and clicking the Excel icon
+					next to <i>My Enrolled Courses</i>.
+				</p>
+				<p>
+					Note that there are multiple ways of exporting your schedule, and not
+					all formats work (despite my best efforts). The method above should be
+					the most reliable.
+				</p>
+
+				<h3>Privacy</h3>
+				<p>
+					This tool runs entirely in <i>your</i> browser, and does not store or
+					send any data to a server.
+				</p>
 			</div>
 
 			<div className="footer-container">

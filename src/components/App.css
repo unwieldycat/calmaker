@@ -9,6 +9,11 @@
 	flex-direction: column;
 }
 
+.info {
+	text-align: left;
+	width: 100%;
+}
+
 .footer-container {
 	width: 100%;
 	display: flex;
