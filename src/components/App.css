@@ -33,15 +33,18 @@
 	}
 }
 
-.controls-container {
+.box {
+	padding: 8px;
+	border: 1.5px solid #f2f2f2;
+	border-radius: 8px;
 	width: calc(100% - 8px);
+}
+
+.controls {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	padding: 8px;
-	border: 1.5px solid #f2f2f2;
-	border-radius: 8px;
 }
 
 .btn-cluster {
@@ -52,7 +55,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-	.controls-container {
+	.box {
 		border-color: #262626;
 	}
 }
