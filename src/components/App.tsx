@@ -2,6 +2,7 @@ import { ChangeEvent, useState } from "react";
 import XLSX from "xlsx";
 import { parseSheet } from "../logic/parser";
 import "./App.css";
+import FeatherIcon from "feather-icons-react";
 
 function App() {
 	const [file, setFile] = useState<File | null>(null);
@@ -41,13 +42,17 @@ function App() {
 			<h1>Convert your WPI Workday schedule to ICS 🗓️</h1>
 
 			<div className="controls-container">
-				<div className="btn-container">
-					<input
-						accept=".xlsx"
-						type="file"
-						id="file-input"
-						onChange={onFileChange}
-					/>
+				<input
+					accept=".xlsx"
+					type="file"
+					id="file-input"
+					onChange={onFileChange}
+				/>
+
+				<div className="btn-cluster">
+					<button id="config" className="icon button">
+						<FeatherIcon icon="settings" size={20} />
+					</button>
 					<button
 						id="start"
 						className="primary button"
@@ -58,6 +63,7 @@ function App() {
 					</button>
 				</div>
 			</div>
+
 			<div className="footer-container">
 				<div className="footer-row">
 					<p>This tool is not officially endorsed by WPI</p>
