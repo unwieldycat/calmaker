@@ -41,7 +41,7 @@ function App() {
 		<>
 			<h1>Convert your WPI Workday schedule to ICS 🗓️</h1>
 
-			<div className="controls-container">
+			<div className="controls box">
 				<input
 					accept=".xlsx"
 					type="file"
@@ -50,7 +50,7 @@ function App() {
 				/>
 
 				<div className="btn-cluster">
-					<button id="config" className="icon button">
+					<button id="config" className="icon button" disabled={file === null}>
 						<FeatherIcon icon="settings" size={20} />
 					</button>
 					<button
@@ -59,7 +59,7 @@ function App() {
 						disabled={file === null}
 						onClick={onStartPressed}
 					>
-						Start
+						<FeatherIcon icon="download" size={20} />
 					</button>
 				</div>
 			</div>
