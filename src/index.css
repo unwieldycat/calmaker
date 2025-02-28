@@ -30,6 +30,7 @@ input[type="file"]::file-selector-button:hover {
 .button.primary {
 	background-color: #007bff;
 	color: #fff;
+	width: 64px;
 }
 
 .button.primary:hover:enabled {
