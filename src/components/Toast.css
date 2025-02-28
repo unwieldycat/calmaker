@@ -1,0 +1,18 @@
+.toast {
+	width: calc(100% - 8px);
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+	padding: 8px;
+	gap: 4px;
+	border: 1.5px solid;
+	border-radius: 8px;
+	font-size: 14px;
+}
+
+.error {
+	border-color: rgba(255, 0, 0, 0.3);
+	background-color: rgba(255, 0, 0, 0.1);
+	color: #ff0000;
+}
