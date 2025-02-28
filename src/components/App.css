@@ -4,6 +4,9 @@
 	padding: 1rem;
 	text-align: center;
 	font-family: Arial, Helvetica, sans-serif;
+	display: flex;
+	gap: 8px;
+	flex-direction: column;
 }
 
 .footer-container {
