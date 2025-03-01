@@ -4,8 +4,25 @@ import { parseSheet } from "../logic/parser";
 import "./App.css";
 import FeatherIcon from "feather-icons-react";
 
+enum ShowState {
+	Settings,
+	Info,
+	None,
+}
+
 function App() {
 	const [file, setFile] = useState<File | null>(null);
+	const [showState, setShowState] = useState<ShowState>(ShowState.None);
+
+	const onInfoPressed = () => {
+		if (showState === ShowState.Info) setShowState(ShowState.None);
+		else setShowState(ShowState.Info);
+	};
+
+	const onSettingsPressed = () => {
+		if (showState === ShowState.Settings) setShowState(ShowState.None);
+		else setShowState(ShowState.Settings);
+	};
 
 	const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
 		if (event.target.files === null || event.target.files.length === 0) {
@@ -49,10 +66,14 @@ function App() {
 				/>
 
 				<div className="btn-cluster">
-					<button className="icon button">
+					<button className="icon button" onClick={onInfoPressed}>
 						<FeatherIcon icon="info" size={20} />
 					</button>
-					<button className="icon button" disabled={file === null}>
+					<button
+						className="icon button"
+						onClick={onSettingsPressed}
+						disabled={file === null}
+					>
 						<FeatherIcon icon="settings" size={20} />
 					</button>
 					<button
@@ -66,7 +87,7 @@ function App() {
 				</div>
 			</div>
 
-			<div className="info box">
+			<div className="info box" hidden={showState !== ShowState.Info}>
 				<h3>Instructions</h3>
 				<p>
 					Export your schedule from Workday and upload it here. You can export
