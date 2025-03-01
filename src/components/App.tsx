@@ -3,6 +3,8 @@ import XLSX from "xlsx";
 import { parseSheet } from "../logic/parser";
 import "./App.css";
 import FeatherIcon from "feather-icons-react";
+import { Schedule } from "../logic/schedule";
+import { Toast, ToastType } from "./Toast";
 
 enum ShowState {
 	Settings,
@@ -11,8 +13,9 @@ enum ShowState {
 }
 
 function App() {
-	const [file, setFile] = useState<File | null>(null);
 	const [showState, setShowState] = useState<ShowState>(ShowState.None);
+	const [schedule, setSchedule] = useState<Schedule | null>(null);
+	const [error, setError] = useState<Error | null>(null);
 
 	const onInfoPressed = () => {
 		if (showState === ShowState.Info) setShowState(ShowState.None);
@@ -25,15 +28,8 @@ function App() {
 	};
 
 	const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-		if (event.target.files === null || event.target.files.length === 0) {
-			setFile(null);
-		} else {
-			setFile(event.target.files[0]);
-		}
-	};
-
-	const onStartPressed = () => {
-		if (!file) return;
+		if (event.target.files === null || event.target.files.length === 0) return;
+		const file = event.target.files[0];
 
 		file.arrayBuffer().then((data) => {
 			const book = XLSX.read(data, {
@@ -45,18 +41,32 @@ function App() {
 
 			parseSheet(sheet)
 				.then((schedule) => {
-					const data = schedule.toICalendar().render();
-					const blob = new Blob([data], { type: "text/calendar" });
-					const url = URL.createObjectURL(blob);
-					window.open(url);
+					if (error) setError(null);
+					setSchedule(schedule);
 				})
-				.catch((e) => console.error(e));
+				.catch((e) => {
+					setSchedule(null);
+					setError(e);
+				});
 		});
+	};
+
+	const downloadFile = () => {
+		if (!schedule) return;
+		const data = schedule.toICalendar().render();
+		const blob = new Blob([data], { type: "text/calendar" });
+		const url = URL.createObjectURL(blob);
+		window.open(url);
 	};
 
 	return (
 		<>
 			<h1>Convert your WPI Workday schedule to ICS 🗓️</h1>
+
+			{error && (
+				<Toast type={ToastType.Error} message={"Failed to parse schedule"} />
+			)}
+
 			<div className="controls box">
 				<input
 					accept=".xlsx"
@@ -72,15 +82,14 @@ function App() {
 					<button
 						className="icon button"
 						onClick={onSettingsPressed}
-						disabled={file === null}
+						disabled={!schedule}
 					>
 						<FeatherIcon icon="settings" size={20} />
 					</button>
 					<button
-						id="start"
 						className="primary button"
-						disabled={file === null}
-						onClick={onStartPressed}
+						disabled={!schedule}
+						onClick={downloadFile}
 					>
 						<FeatherIcon icon="download" size={20} />
 					</button>
