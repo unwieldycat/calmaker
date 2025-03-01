@@ -6,13 +6,17 @@
 	align-items: center;
 	padding: 8px;
 	gap: 4px;
-	border: 1.5px solid;
 	border-radius: 8px;
 	font-size: 14px;
 }
 
 .error {
-	border-color: rgba(255, 0, 0, 0.3);
-	background-color: rgba(255, 0, 0, 0.1);
-	color: #ff0000;
+	background-color: rgba(255, 0, 0, 0.2);
+	color: #660000;
+}
+
+@media (prefers-color-scheme: dark) {
+	.error {
+		color: #ff9999;
+	}
 }
