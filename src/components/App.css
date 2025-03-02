@@ -9,11 +9,6 @@
 	flex-direction: column;
 }
 
-.info {
-	text-align: left;
-	width: 100%;
-}
-
 .footer-container {
 	width: 100%;
 	display: flex;
@@ -45,7 +40,6 @@
 	padding: 8px;
 	border: 1.5px solid #f2f2f2;
 	border-radius: 8px;
-	width: calc(100% - 8px);
 }
 
 .controls {
