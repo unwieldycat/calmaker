@@ -7,7 +7,6 @@ import { Schedule } from "../logic/schedule";
 import { Toast, ToastType } from "./Toast";
 
 enum ShowState {
-	Settings,
 	Info,
 	None,
 }
@@ -20,11 +19,6 @@ function App() {
 	const onInfoPressed = () => {
 		if (showState === ShowState.Info) setShowState(ShowState.None);
 		else setShowState(ShowState.Info);
-	};
-
-	const onSettingsPressed = () => {
-		if (showState === ShowState.Settings) setShowState(ShowState.None);
-		else setShowState(ShowState.Settings);
 	};
 
 	const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -78,13 +72,6 @@ function App() {
 				<div className="btn-cluster">
 					<button className="icon button" onClick={onInfoPressed}>
 						<FeatherIcon icon="info" size={20} />
-					</button>
-					<button
-						className="icon button"
-						onClick={onSettingsPressed}
-						disabled={!schedule}
-					>
-						<FeatherIcon icon="settings" size={20} />
 					</button>
 					<button
 						className="primary button"
