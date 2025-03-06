@@ -64,7 +64,10 @@ function App() {
 			<h1>Convert your WPI Workday schedule to ICS 🗓️</h1>
 
 			{error && (
-				<Toast type={ToastType.Error} message={"Failed to parse schedule"} />
+				<Toast
+					type={ToastType.Error}
+					message={"Failed to parse schedule. Did you upload the correct file?"}
+				/>
 			)}
 
 			<div className="controls box">
