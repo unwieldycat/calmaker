@@ -7,7 +7,6 @@ import { Schedule } from "../logic/schedule";
 import { Toast, ToastType } from "./Toast";
 
 enum ShowState {
-	Settings,
 	Info,
 	None,
 }
@@ -20,11 +19,6 @@ function App() {
 	const onInfoPressed = () => {
 		if (showState === ShowState.Info) setShowState(ShowState.None);
 		else setShowState(ShowState.Info);
-	};
-
-	const onSettingsPressed = () => {
-		if (showState === ShowState.Settings) setShowState(ShowState.None);
-		else setShowState(ShowState.Settings);
 	};
 
 	const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -83,13 +77,6 @@ function App() {
 						<FeatherIcon icon="info" size={20} />
 					</button>
 					<button
-						className="icon button"
-						onClick={onSettingsPressed}
-						disabled={!schedule}
-					>
-						<FeatherIcon icon="settings" size={20} />
-					</button>
-					<button
 						className="primary button"
 						disabled={!schedule}
 						onClick={downloadFile}
@@ -99,21 +86,19 @@ function App() {
 				</div>
 			</div>
 
-			<div className="info box" hidden={showState !== ShowState.Info}>
+			<div className="box" hidden={showState !== ShowState.Info}>
 				<h3>Instructions</h3>
+				<p>Export your schedule from Workday by navigating to</p>
+				<b>Academics {">"} View My Courses</b>
 				<p>
-					Export your schedule from Workday and upload it here. You can export
-					your schedule from Workday by navigating to{" "}
-					<i>Academics {">"} View My Courses</i> and clicking the Excel icon
-					next to <i>My Enrolled Courses</i>.
+					and clicking the Excel icon above the <b>My Enrolled Courses</b>{" "}
+					table.
 				</p>
 				<p>
-					Note that there are multiple ways of exporting your schedule, and not
-					all formats work (despite my best efforts). The method above should be
-					the most reliable.
+					Upload the <code>.xlsx</code> file here and click download to generate
+					a <code>.ics</code> file that can be imported to any calendar app.
 				</p>
-
-				<h3>Privacy</h3>
+				<h3>Privacy Statement</h3>
 				<p>
 					This tool runs entirely in <i>your</i> browser, and does not store or
 					send any data to a server.
