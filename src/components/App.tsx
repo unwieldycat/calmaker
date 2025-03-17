@@ -59,57 +59,62 @@ function App() {
 
 	return (
 		<>
-			<h1>Convert your WPI Workday schedule to ICS 🗓️</h1>
+			<main>
+				<h1>Convert your WPI Workday schedule to ICS 🗓️</h1>
 
-			{error && (
-				<Toast
-					type={ToastType.Error}
-					message={"Failed to parse schedule. Did you upload the correct file?"}
-				/>
-			)}
+				{error && (
+					<Toast
+						type={ToastType.Error}
+						message={
+							"Failed to parse schedule. Did you upload the correct file?"
+						}
+					/>
+				)}
 
-			<div className="controls box">
-				<input
-					accept=".xlsx"
-					type="file"
-					id="file-input"
-					onChange={onFileChange}
-				/>
+				<div className="controls box">
+					<input
+						accept=".xlsx"
+						type="file"
+						id="file-input"
+						onChange={onFileChange}
+					/>
 
-				<div className="btn-cluster">
-					<button className="icon button" onClick={onInfoPressed}>
-						<FeatherIcon icon="info" size={20} />
-					</button>
-					<button
-						className="primary button"
-						disabled={!schedule}
-						onClick={downloadFile}
-					>
-						<FeatherIcon icon="download" size={20} />
-					</button>
+					<div className="btn-cluster">
+						<button className="icon button" onClick={onInfoPressed}>
+							<FeatherIcon icon="info" size={20} />
+						</button>
+						<button
+							className="primary button"
+							disabled={!schedule}
+							onClick={downloadFile}
+						>
+							<FeatherIcon icon="download" size={20} />
+						</button>
+					</div>
 				</div>
-			</div>
 
-			<div className="box" hidden={showState !== ShowState.Info}>
-				<h3>Instructions</h3>
-				<p>Export your schedule from Workday by navigating to</p>
-				<b>Academics {">"} View My Courses</b>
-				<p>
-					and clicking the Excel icon above the <b>My Enrolled Courses</b>{" "}
-					table.
-				</p>
-				<p>
-					Upload the <code>.xlsx</code> file here and click download to generate
-					a <code>.ics</code> file that can be imported to any calendar app.
-				</p>
-				<h3>Privacy Statement</h3>
-				<p>
-					This tool runs entirely in <i>your</i> browser, and does not store or
-					send any data to a server.
-				</p>
-			</div>
+				<div className="box" hidden={showState !== ShowState.Info}>
+					<h3>Instructions</h3>
+					<p>Export your schedule from Workday by navigating to</p>
+					<b>Academics {">"} View My Courses</b>
+					<p>
+						and clicking the Excel icon above the <b>My Enrolled Courses</b>{" "}
+						table.
+					</p>
+					<p>
+						Upload the <code>.xlsx</code> file here and click download to
+						generate a <code>.ics</code> file that can be imported to any
+						calendar app.
+					</p>
+					<h3>Privacy Statement</h3>
+					<p>
+						This tool runs entirely in <i>your</i> browser, and does not store
+						or send any data to a server.
+					</p>
+				</div>
+			</main>
 
-			<div className="footer-container">
+			<footer>
 				<div className="footer-row">
 					<p>This tool is not officially endorsed by WPI</p>
 				</div>
@@ -118,7 +123,7 @@ function App() {
 					<p> • </p>
 					<a href="https://github.com/unwieldycat/calmaker">View Source</a>
 				</div>
-			</div>
+			</footer>
 		</>
 	);
 }
