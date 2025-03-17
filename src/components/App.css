@@ -1,5 +1,6 @@
 #root {
 	max-width: 512px;
+	width: calc(100% - 32px);
 	margin: 0 auto;
 	text-align: center;
 	font-family: Arial, Helvetica, sans-serif;
@@ -51,7 +52,7 @@ footer {
 	padding: 8px;
 	border: 1.5px solid #f2f2f2;
 	border-radius: 8px;
-	width: calc(100% - 32px);
+	width: calc(100% - 16px);
 }
 
 .controls {
