@@ -1,5 +1,6 @@
 import XLSX from "xlsx";
 import { Schedule, Section, Weekdays } from "./schedule";
+import { sheetToArray } from "./sheet";
 
 /**
  * Error thrown when parsing fails
@@ -153,8 +154,7 @@ function addTimeToDate(date: Date, time: number[]) {
  * @returns A schedule object
  */
 export async function parseSheet(sheet: XLSX.WorkSheet): Promise<Schedule> {
-	// FIXME: sheet_to_json gives bad output with certain formats of the sheet
-	const sheetData: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+	const sheetData: unknown[][] = sheetToArray(sheet);
 	const headerRow = findHeaderRow(sheetData);
 	const dataColumns = findColumns(
 		[
