@@ -1,6 +1,6 @@
 import XLSX from "xlsx";
 import { Schedule, Section, Weekdays } from "./schedule";
-import { sheetToArray } from "./sheet";
+import { sheetToArray, CellValue } from "./sheet";
 
 /**
  * Error thrown when parsing fails
@@ -30,7 +30,7 @@ enum Columns {
  * @param sheetData 2D array of strings representing the sheet data
  * @returns Header row index
  */
-export function findHeaderRow(sheetData: unknown[][]): number {
+export function findHeaderRow(sheetData: CellValue[][]): number {
 	let headerRow;
 	for (let r = 0; r < sheetData.length; r++) {
 		const row = sheetData[r];
@@ -53,7 +53,7 @@ export function findHeaderRow(sheetData: unknown[][]): number {
 export function findColumns(
 	headerNames: string[],
 	headerRow: number,
-	sheetData: unknown[][]
+	sheetData: CellValue[][]
 ): Record<string, number> {
 	const columns: Record<string, number> = {};
 	if (sheetData.length <= headerRow)
@@ -97,7 +97,7 @@ export function parseTimeString(time: string): [number, number] {
  * @param courseNameCell Cell data
  * @returns Course ID and full name as strings
  */
-function parseCourseName(courseNameCell: unknown) {
+function parseCourseName(courseNameCell: CellValue) {
 	if (typeof courseNameCell != "string")
 		throw new ParseError(
 			"courseName: Expected string, got " + typeof courseNameCell
@@ -114,7 +114,7 @@ function parseCourseName(courseNameCell: unknown) {
  * @param patternCell Cell data
  * @returns Days, startTime, endTime, and location
  */
-function parseMeetingPattern(patternCell: unknown) {
+function parseMeetingPattern(patternCell: CellValue) {
 	if (typeof patternCell != "string")
 		throw new ParseError(
 			"meetingPatterns: Expected string, got " + typeof patternCell
@@ -154,7 +154,7 @@ function addTimeToDate(date: Date, time: number[]) {
  * @returns A schedule object
  */
 export async function parseSheet(sheet: XLSX.WorkSheet): Promise<Schedule> {
-	const sheetData: unknown[][] = sheetToArray(sheet);
+	const sheetData: CellValue[][] = sheetToArray(sheet);
 	const headerRow = findHeaderRow(sheetData);
 	const dataColumns = findColumns(
 		[

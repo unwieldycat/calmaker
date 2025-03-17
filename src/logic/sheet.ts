@@ -1,6 +1,6 @@
 import XLSX from "xlsx";
 
-type CellValue = string | number | boolean | Date | null;
+export type CellValue = string | number | boolean | Date | null;
 
 /**
  * Turn an XLSX Worksheet into a 2D array.
