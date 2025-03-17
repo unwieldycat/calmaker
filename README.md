@@ -1,13 +1,3 @@
-> [!NOTE]
-> This is still a work in progress.
-> ### Todo
-> - [x] Parse output
-> - [ ] Ability to customize output
->	- [ ] Wellness days
->	- [ ] Include/exclude term
-> - [ ] Success/Error feedback
-> - [x] Save to .ics
+# WPI Calendar Maker
 
-# WPI Calmaker
-
-A local web application to convert a workday excel sheet into an ics file.
+A web application to convert a time table exported from WPI's Workday site into a `.ics` file.
