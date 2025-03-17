@@ -39,6 +39,7 @@ function App() {
 					setSchedule(schedule);
 				})
 				.catch((e) => {
+					console.error(e);
 					setSchedule(null);
 					setError(e);
 				});
