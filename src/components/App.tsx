@@ -5,6 +5,7 @@ import "./App.css";
 import FeatherIcon from "feather-icons-react";
 import { Schedule } from "../logic/schedule";
 import { Toast, ToastType } from "./Toast";
+import { sheetToArray } from "../logic/sheet";
 
 enum ShowState {
 	Info,
@@ -32,14 +33,16 @@ function App() {
 				cellDates: true,
 			});
 			const sheet = book.Sheets[book.SheetNames[0]];
+			const sheetData = sheetToArray(sheet);
 
-			parseSheet(sheet)
+			parseSheet(sheetData)
 				.then((schedule) => {
 					if (error) setError(null);
 					setSchedule(schedule);
 				})
 				.catch((e) => {
 					console.error(e);
+					console.error("Erroneous sheet data below:", sheetData);
 					setSchedule(null);
 					setError(e);
 				});

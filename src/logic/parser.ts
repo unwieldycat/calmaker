@@ -25,6 +25,8 @@ enum Columns {
 	INSTRUCTOR = "Instructor",
 }
 
+const endOfRowCells = ["My Dropped/Withdrawn Courses", "My Completed Courses"];
+
 /**
  * Find the header row in the sheet data
  * @param sheetData 2D array of strings representing the sheet data
@@ -153,8 +155,7 @@ function addTimeToDate(date: Date, time: number[]) {
  * @param sheet XLSX Worksheet to parse
  * @returns A schedule object
  */
-export async function parseSheet(sheet: XLSX.WorkSheet): Promise<Schedule> {
-	const sheetData: CellValue[][] = sheetToArray(sheet);
+export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
 	const headerRow = findHeaderRow(sheetData);
 	const dataColumns = findColumns(
 		[
@@ -175,7 +176,8 @@ export async function parseSheet(sheet: XLSX.WorkSheet): Promise<Schedule> {
 		const row = sheetData[r];
 
 		// Stop parsing if the extended version of this sheet is reached
-		if (row[0] === "My Dropped/Withdrawn Courses") break;
+		if (typeof row[0] == "string" && endOfRowCells.indexOf(row[0]) !== -1)
+			break;
 
 		let [courseId, courseFullName] = parseCourseName(
 			row[dataColumns[Columns.COURSE_LISTING]]
