@@ -1,8 +1,8 @@
 import { ChangeEvent, useState } from "react";
-import XLSX from "xlsx";
+import { read } from "xlsx";
 import { parseSheet } from "../logic/parser";
 import "./App.css";
-import FeatherIcon from "feather-icons-react";
+import { Download, Info } from "feather-icons-react";
 import { Schedule } from "../logic/schedule";
 import { Toast, ToastType } from "./Toast";
 import { sheetToArray } from "../logic/sheet";
@@ -27,7 +27,7 @@ function App() {
 		const file = event.target.files[0];
 
 		file.arrayBuffer().then((data) => {
-			const book = XLSX.read(data, {
+			const book = read(data, {
 				type: "array",
 				dense: true,
 				cellDates: true,
@@ -81,14 +81,14 @@ function App() {
 
 					<div className="btn-cluster">
 						<button className="icon button" onClick={onInfoPressed}>
-							<FeatherIcon icon="info" size={20} />
+							<Info size={20} />
 						</button>
 						<button
 							className="primary button"
 							disabled={!schedule}
 							onClick={downloadFile}
 						>
-							<FeatherIcon icon="download" size={20} />
+							<Download size={20} />
 						</button>
 					</div>
 				</div>

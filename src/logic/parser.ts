@@ -1,6 +1,5 @@
-import XLSX from "xlsx";
-import { Schedule, Section, Weekdays } from "./schedule";
-import { sheetToArray, CellValue } from "./sheet";
+import { Schedule, Weekdays } from "./schedule";
+import { CellValue } from "./sheet";
 
 /**
  * Error thrown when parsing fails
