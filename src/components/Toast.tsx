@@ -1,10 +1,10 @@
-import FeatherIcon from "feather-icons-react";
+import { AlertTriangle } from "feather-icons-react";
 import "./Toast.css";
 
 export function Toast({ type, message }: { type: ToastType; message: string }) {
 	return (
 		<div className={`${type} toast`}>
-			<FeatherIcon icon="alert-triangle" size={14} />
+			<AlertTriangle size={14} />
 			{message}
 		</div>
 	);
