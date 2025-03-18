@@ -1,11 +1,10 @@
 import { ChangeEvent, useState } from "react";
-import { read } from "xlsx";
 import { parseSheet } from "../logic/parser";
-import "./App.css";
 import { Download, Info } from "feather-icons-react";
 import { Schedule } from "../logic/schedule";
 import { Toast, ToastType } from "./Toast";
 import { sheetToArray } from "../logic/sheet";
+import "./App.css";
 
 enum ShowState {
 	Info,
@@ -26,7 +25,8 @@ function App() {
 		if (event.target.files === null || event.target.files.length === 0) return;
 		const file = event.target.files[0];
 
-		file.arrayBuffer().then((data) => {
+		file.arrayBuffer().then(async (data) => {
+			const { read } = await import("xlsx");
 			const book = read(data, {
 				type: "array",
 				dense: true,
