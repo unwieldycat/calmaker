@@ -70,6 +70,7 @@ export class Schedule {
 				start: section.start,
 				end: section.end,
 				recurrence: {
+					frequency: "DAILY",
 					weekdays: weekdays,
 					end: section.lastDate,
 				},
