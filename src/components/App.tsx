@@ -1,14 +1,14 @@
 import { ChangeEvent, useState } from "react";
 import { parseSheet } from "../lib/parser";
-import { Download, Info } from "feather-icons-react";
+import { Download, HelpCircle } from "feather-icons-react";
 import { Schedule } from "../lib/schedule";
 import { Toast } from "./Toast";
 import { sheetToArray } from "../lib/sheet";
 import { Instructions } from "./Instructions";
 import { Footer } from "./Footer";
-import styles from "./App.module.css";
 import { Button } from "./Button";
 import { FilePicker } from "./FilePicker";
+import styles from "./App.module.css";
 
 enum ShowState {
 	Info,
@@ -80,7 +80,7 @@ function App() {
 
 					<div className={styles.btnCluster}>
 						<Button onClick={onInfoPressed} intent="secondary">
-							<Info size={20} /> Help
+							<HelpCircle size={20} /> Help
 						</Button>
 						<Button
 							disabled={!schedule}
