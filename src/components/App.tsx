@@ -1,9 +1,9 @@
 import { ChangeEvent, useState } from "react";
-import { parseSheet } from "../logic/parser";
+import { parseSheet } from "../lib/parser";
 import { Download, Info } from "feather-icons-react";
-import { Schedule } from "../logic/schedule";
+import { Schedule } from "../lib/schedule";
 import { Toast } from "./Toast";
-import { sheetToArray } from "../logic/sheet";
+import { sheetToArray } from "../lib/sheet";
 import { Instructions } from "./Instructions";
 import { Footer } from "./Footer";
 import styles from "./App.module.css";

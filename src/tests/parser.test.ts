@@ -1,5 +1,5 @@
-import { describe, expect, it, test } from "vitest";
-import { findColumns, ParseError, parseTimeString } from "./parser";
+import { describe, expect, it } from "vitest";
+import { findColumns, ParseError, parseTimeString } from "../lib/parser";
 
 describe("findColumns", async () => {
 	const sheetData = [
