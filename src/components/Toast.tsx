@@ -1,15 +1,28 @@
 import { AlertTriangle } from "feather-icons-react";
-import "./Toast.css";
+import { cva } from "class-variance-authority";
+import styles from "./Toast.module.css";
 
-export function Toast({ type, message }: { type: ToastType; message: string }) {
+const toastVariants = cva(styles.toast, {
+	variants: {
+		type: {
+			error: styles.error,
+		},
+	},
+	defaultVariants: {
+		type: "error",
+	},
+});
+
+export function Toast({ type, message }: ToastProps) {
 	return (
-		<div className={`${type} toast`}>
+		<div className={toastVariants({ type })}>
 			<AlertTriangle size={14} />
 			{message}
 		</div>
 	);
 }
 
-export enum ToastType {
-	Error = "error",
+export interface ToastProps {
+	type: "error";
+	message: string;
 }
