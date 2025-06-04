@@ -2,7 +2,7 @@ import { ChangeEvent, useState } from "react";
 import { parseSheet } from "../logic/parser";
 import { Download, Info } from "feather-icons-react";
 import { Schedule } from "../logic/schedule";
-import { Toast, ToastType } from "./Toast";
+import { Toast } from "./Toast";
 import { sheetToArray } from "../logic/sheet";
 import "./App.css";
 
@@ -64,7 +64,7 @@ function App() {
 
 				{error && (
 					<Toast
-						type={ToastType.Error}
+						type="error"
 						message={
 							"Failed to parse schedule. Did you upload the correct file?"
 						}
