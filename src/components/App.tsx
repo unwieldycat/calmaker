@@ -4,7 +4,9 @@ import { Download, Info } from "feather-icons-react";
 import { Schedule } from "../logic/schedule";
 import { Toast } from "./Toast";
 import { sheetToArray } from "../logic/sheet";
-import "./App.css";
+import { Instructions } from "./Instructions";
+import { Footer } from "./Footer";
+import styles from "./App.module.css";
 
 enum ShowState {
 	Info,
@@ -59,7 +61,7 @@ function App() {
 
 	return (
 		<>
-			<main>
+			<main className={styles.main}>
 				<h1>Convert your WPI Workday schedule to ICS 🗓️</h1>
 
 				{error && (
@@ -71,7 +73,7 @@ function App() {
 					/>
 				)}
 
-				<div className="controls box">
+				<div className={`${styles.controls} box`}>
 					<input
 						accept=".xlsx"
 						type="file"
@@ -79,7 +81,7 @@ function App() {
 						onChange={onFileChange}
 					/>
 
-					<div className="btn-cluster">
+					<div className={styles.btnCluster}>
 						<button className="icon button" onClick={onInfoPressed}>
 							<Info size={20} />
 						</button>
@@ -93,37 +95,10 @@ function App() {
 					</div>
 				</div>
 
-				<div className="box" hidden={showState !== ShowState.Info}>
-					<h3>Instructions</h3>
-					<p>Export your schedule from Workday by navigating to</p>
-					<b>Academics {">"} View My Courses</b>
-					<p>
-						and clicking the Excel icon above the <b>My Enrolled Courses</b>{" "}
-						table.
-					</p>
-					<p>
-						Upload the <code>.xlsx</code> file here and click download to
-						generate a <code>.ics</code> file that can be imported to any
-						calendar app.
-					</p>
-					<h3>Privacy Statement</h3>
-					<p>
-						This tool runs entirely in <i>your</i> browser, and does not store
-						or send any data to a server.
-					</p>
-				</div>
+				{showState === ShowState.Info && <Instructions />}
 			</main>
 
-			<footer>
-				<div className="footer-row">
-					<p>This tool is not officially endorsed by WPI</p>
-				</div>
-				<div className="footer-row">
-					<p>© 2025 Thurston A Yates</p>
-					<p> • </p>
-					<a href="https://github.com/unwieldycat/calmaker">View Source</a>
-				</div>
-			</footer>
+			<Footer />
 		</>
 	);
 }
