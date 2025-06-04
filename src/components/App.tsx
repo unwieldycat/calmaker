@@ -7,6 +7,8 @@ import { sheetToArray } from "../lib/sheet";
 import { Instructions } from "./Instructions";
 import { Footer } from "./Footer";
 import styles from "./App.module.css";
+import { Button } from "./Button";
+import { FilePicker } from "./FilePicker";
 
 enum ShowState {
 	Info,
@@ -74,24 +76,19 @@ function App() {
 				)}
 
 				<div className={`${styles.controls} box`}>
-					<input
-						accept=".xlsx"
-						type="file"
-						id="file-input"
-						onChange={onFileChange}
-					/>
+					<FilePicker accept=".xlsx" onChange={onFileChange} />
 
 					<div className={styles.btnCluster}>
-						<button className="icon button" onClick={onInfoPressed}>
-							<Info size={20} />
-						</button>
-						<button
-							className="primary button"
+						<Button onClick={onInfoPressed} intent="secondary">
+							<Info size={20} /> Help
+						</Button>
+						<Button
 							disabled={!schedule}
 							onClick={downloadFile}
+							intent="primary"
 						>
-							<Download size={20} />
-						</button>
+							<Download size={20} /> Download
+						</Button>
 					</div>
 				</div>
 

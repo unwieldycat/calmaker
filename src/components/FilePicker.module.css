@@ -1,0 +1,40 @@
+.wrapper {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.input {
+	display: none;
+}
+
+.label {
+	cursor: pointer;
+	user-select: none;
+	font-size: 14px;
+	height: 36px; /* Match .button height */
+	padding: 8px; /* Match .button padding */
+	box-sizing: border-box;
+}
+
+.label:hover {
+	background-color: #e6e6e6;
+}
+
+.fileName {
+	font-size: 0.95em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 200px;
+	white-space: nowrap;
+}
+
+@media (prefers-color-scheme: dark) {
+	.fileName {
+		color: #ccc;
+	}
+
+	.label:hover {
+		background-color: #333333;
+	}
+}
