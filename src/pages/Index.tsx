@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { parseSheet } from "../lib/parser";
-import { Download, HelpCircle } from "feather-icons-react";
+import { ArrowLeft, Download, HelpCircle, X } from "feather-icons-react";
 import { Schedule } from "../lib/schedule";
 import { Toast } from "../components/Toast/Toast";
 import { sheetToArray } from "../lib/sheet";
@@ -91,13 +91,19 @@ export function IndexPage() {
 					<div className={styles.step}>
 						<h2>Step 2</h2>
 						<p>Download calendar and import into any calendar app</p>
-						<Button
-							disabled={!schedule}
-							onClick={downloadFile}
-							intent="primary"
-						>
-							<Download size={20} /> Download
-						</Button>
+
+						<div className={styles.btnCluster}>
+							<Button intent="secondary" onClick={() => setSchedule(null)}>
+								<ArrowLeft size={20} /> Done
+							</Button>
+							<Button
+								disabled={!schedule}
+								onClick={downloadFile}
+								intent="primary"
+							>
+								<Download size={20} /> Download
+							</Button>
+						</div>
 					</div>
 				)}
 
