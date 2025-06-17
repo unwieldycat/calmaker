@@ -18,7 +18,7 @@ export function FilePicker({ ...props }: FilePickerProps) {
 	};
 
 	return (
-		<div className={styles.wrapper}>
+		<>
 			<input
 				id={id}
 				ref={inputRef}
@@ -42,7 +42,6 @@ export function FilePicker({ ...props }: FilePickerProps) {
 			>
 				<Upload size={16} /> Upload
 			</label>
-			<span className={styles.fileName}>{fileName}</span>
-		</div>
+		</>
 	);
 }
