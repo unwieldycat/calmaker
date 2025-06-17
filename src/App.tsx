@@ -1,13 +1,21 @@
 import { IndexPage } from "./pages/Index";
 import styles from "./App.module.css";
-import { Footer } from "./components/Footer/Footer";
 
 export function App() {
 	return (
 		<div className={styles.centeredContainer}>
 			<h1>WPI Calendar Generator</h1>
 			<IndexPage />
-			<Footer />
+			<footer className={styles.footer}>
+				<div className={styles.footerRow}>
+					<p>This tool is not officially endorsed by WPI</p>
+				</div>
+				<div className={styles.footerRow}>
+					<p>© 2025 Thurston A Yates</p>
+					<p> • </p>
+					<a href="https://github.com/unwieldycat/calmaker">View Source</a>
+				</div>
+			</footer>
 		</div>
 	);
 }
