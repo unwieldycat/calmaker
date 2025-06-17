@@ -8,7 +8,7 @@ import { Instructions } from "../components/Instructions/Instructions";
 import { Footer } from "../components/Footer/Footer";
 import { Button } from "../components/Button/Button";
 import { FilePicker } from "../components/FilePicker/FilePicker";
-import styles from "./App.module.css";
+import styles from "./Index.module.css";
 
 enum ShowState {
 	Info,
