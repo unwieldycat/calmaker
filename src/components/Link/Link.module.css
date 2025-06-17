@@ -1,0 +1,14 @@
+.link {
+	padding: 0.25rem 0.5rem;
+	border-radius: 8px;
+	text-decoration: none;
+	color: rgb(33, 150, 243);
+	background-color: rgba(33, 150, 243, 0.05);
+	display: inline-flex;
+	flex-direction: row;
+	align-self: center;
+	justify-content: center;
+	align-content: center;
+	gap: 4px;
+	margin: 4px;
+}
