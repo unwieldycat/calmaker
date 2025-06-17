@@ -1,9 +1,12 @@
 .main {
 	gap: 8px;
+	height: 100%;
+	max-width: 512px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+	text-align: center;
 }
 
 .controls {

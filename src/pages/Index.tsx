@@ -5,7 +5,6 @@ import { Schedule } from "../lib/schedule";
 import { Toast } from "../components/Toast/Toast";
 import { sheetToArray } from "../lib/sheet";
 import { Instructions } from "../components/Instructions/Instructions";
-import { Footer } from "../components/Footer/Footer";
 import { Button } from "../components/Button/Button";
 import { FilePicker } from "../components/FilePicker/FilePicker";
 import styles from "./Index.module.css";
@@ -15,7 +14,7 @@ enum ShowState {
 	None,
 }
 
-function App() {
+export function IndexPage() {
 	const [showState, setShowState] = useState<ShowState>(ShowState.None);
 	const [schedule, setSchedule] = useState<Schedule | null>(null);
 	const [error, setError] = useState<Error | null>(null);
@@ -94,10 +93,6 @@ function App() {
 
 				{showState === ShowState.Info && <Instructions />}
 			</main>
-
-			<Footer />
 		</>
 	);
 }
-
-export default App;
