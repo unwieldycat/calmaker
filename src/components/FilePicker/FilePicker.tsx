@@ -1,5 +1,5 @@
 import { InputHTMLAttributes, useRef, useState } from "react";
-import buttonStyles from "./Button.module.css";
+import buttonStyles from "../Button/Button.module.css";
 import styles from "./FilePicker.module.css";
 import { Upload } from "feather-icons-react";
 

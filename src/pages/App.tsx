@@ -2,12 +2,12 @@ import { ChangeEvent, useState } from "react";
 import { parseSheet } from "../lib/parser";
 import { Download, HelpCircle } from "feather-icons-react";
 import { Schedule } from "../lib/schedule";
-import { Toast } from "./Toast";
+import { Toast } from "../components/Toast/Toast";
 import { sheetToArray } from "../lib/sheet";
-import { Instructions } from "./Instructions";
-import { Footer } from "./Footer";
-import { Button } from "./Button";
-import { FilePicker } from "./FilePicker";
+import { Instructions } from "../components/Instructions/Instructions";
+import { Footer } from "../components/Footer/Footer";
+import { Button } from "../components/Button/Button";
+import { FilePicker } from "../components/FilePicker/FilePicker";
 import styles from "./App.module.css";
 
 enum ShowState {
