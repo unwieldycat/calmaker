@@ -46,3 +46,7 @@
 	width: fit-content;
 	gap: 8px;
 }
+
+.title {
+	margin: 32px;
+}

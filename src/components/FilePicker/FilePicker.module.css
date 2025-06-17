@@ -11,7 +11,7 @@
 }
 
 .label:hover {
-	background-color: #006fe6;
+	background-color: var(--color-primary-hover);
 }
 
 .fileName {

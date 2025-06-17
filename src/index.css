@@ -1,17 +1,20 @@
 :root {
-	background-color: #ffffff;
+	background-color: var(--color-background);
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 16px;
 	line-height: 1.5;
 
 	--color-border: #f2f2f2;
+	--color-primary: #ac2b37;
+	--color-primary-hover: #b33a45;
+	--color-background: #fff;
 }
 
 @media (prefers-color-scheme: dark) {
 	body {
-		background-color: #1a1a1a;
 		color: #fff;
 		--color-border: #262626;
+		--color-background: #1a1a1a;
 	}
 }
 
