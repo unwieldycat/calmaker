@@ -99,7 +99,10 @@ export function IndexPage() {
 				{step == 2 && (
 					<div className={styles.step}>
 						<h2>Step 2</h2>
-						<p>Download calendar and import into any calendar app</p>
+						<p>
+							Download the <code>.ics</code> file and import it into your
+							calendar
+						</p>
 
 						<div className={styles.btnCluster}>
 							<Button intent="secondary" onClick={() => setSchedule(null)}>
