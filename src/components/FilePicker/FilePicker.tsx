@@ -32,7 +32,7 @@ export function FilePicker({ ...props }: FilePickerProps) {
 			/>
 			<label
 				htmlFor={id}
-				className={`${buttonStyles.button} ${buttonStyles.secondary} ${styles.label}`}
+				className={`${buttonStyles.button} ${buttonStyles.primary} ${styles.label}`}
 				tabIndex={0}
 				onKeyDown={(e) => {
 					if (e.key === "Enter" || e.key === " ") {
