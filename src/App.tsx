@@ -5,6 +5,7 @@ import { Footer } from "./components/Footer/Footer";
 export function App() {
 	return (
 		<div className={styles.centeredContainer}>
+			<h1>WPI Calendar Generator</h1>
 			<IndexPage />
 			<Footer />
 		</div>
