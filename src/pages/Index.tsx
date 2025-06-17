@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { parseSheet } from "../lib/parser";
-import { ArrowLeft, Download, HelpCircle, X } from "feather-icons-react";
+import { ArrowLeft, Check, Download, HelpCircle, X } from "feather-icons-react";
 import { Schedule } from "../lib/schedule";
 import { Toast } from "../components/Toast/Toast";
 import { sheetToArray } from "../lib/sheet";
@@ -8,14 +8,15 @@ import { Instructions } from "../components/Instructions/Instructions";
 import { Button } from "../components/Button/Button";
 import { FilePicker } from "../components/FilePicker/FilePicker";
 import styles from "./Index.module.css";
+import { Dialog } from "../components/Dialog/Dialog";
 
-enum ShowState {
+enum DialogState {
 	Info,
 	None,
 }
 
 export function IndexPage() {
-	const [showState, setShowState] = useState<ShowState>(ShowState.None);
+	const [showState, setShowState] = useState<DialogState>(DialogState.None);
 	const [schedule, setSchedule] = useState<Schedule | null>(null);
 	const [error, setError] = useState<Error | null>(null);
 	const [step, setStep] = useState<number>(1);
@@ -29,8 +30,11 @@ export function IndexPage() {
 	}, [schedule]);
 
 	const onInfoPressed = () => {
-		if (showState === ShowState.Info) setShowState(ShowState.None);
-		else setShowState(ShowState.Info);
+		setShowState(DialogState.Info);
+	};
+
+	const closeDialog = () => {
+		setShowState(DialogState.None);
 	};
 
 	const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -83,7 +87,12 @@ export function IndexPage() {
 					<div className={styles.step}>
 						<h2>Step 1</h2>
 						<p>Upload your registered classes spreadsheet</p>
-						<FilePicker accept=".xlsx" onChange={onFileChange} />
+						<div className={styles.btnCluster}>
+							<FilePicker accept=".xlsx" onChange={onFileChange} />
+							<Button intent="secondary" onClick={onInfoPressed}>
+								<HelpCircle size={20} /> Help
+							</Button>
+						</div>
 					</div>
 				)}
 
@@ -107,7 +116,24 @@ export function IndexPage() {
 					</div>
 				)}
 
-				{showState === ShowState.Info && <Instructions />}
+				{showState === DialogState.Info && (
+					<Dialog>
+						<h2>Obtaining your spreadsheet</h2>
+						<p>
+							In Workday, navigate to <b>Academics {">"} View My Courses</b>
+						</p>
+						<p>
+							Click the Excel sheet icon above the <b>My Enrolled Courses</b>{" "}
+							table. It should download your registrations as an{" "}
+							<code>.xlsx</code> spreadsheet.
+						</p>
+
+						<Button intent="secondary" onClick={closeDialog}>
+							<Check size={20} />
+							Got it
+						</Button>
+					</Dialog>
+				)}
 			</main>
 		</>
 	);
