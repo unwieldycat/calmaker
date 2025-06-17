@@ -1,5 +1,5 @@
 import { InputHTMLAttributes, useRef, useState } from "react";
-import buttonStyles from "./Button.module.css";
+import buttonStyles from "../Button/Button.module.css";
 import styles from "./FilePicker.module.css";
 import { Upload } from "feather-icons-react";
 
@@ -18,7 +18,7 @@ export function FilePicker({ ...props }: FilePickerProps) {
 	};
 
 	return (
-		<div className={styles.wrapper}>
+		<>
 			<input
 				id={id}
 				ref={inputRef}
@@ -32,7 +32,7 @@ export function FilePicker({ ...props }: FilePickerProps) {
 			/>
 			<label
 				htmlFor={id}
-				className={`${buttonStyles.button} ${buttonStyles.secondary} ${styles.label}`}
+				className={`${buttonStyles.button} ${buttonStyles.primary} ${styles.label}`}
 				tabIndex={0}
 				onKeyDown={(e) => {
 					if (e.key === "Enter" || e.key === " ") {
@@ -42,7 +42,6 @@ export function FilePicker({ ...props }: FilePickerProps) {
 			>
 				<Upload size={16} /> Upload
 			</label>
-			<span className={styles.fileName}>{fileName}</span>
-		</div>
+		</>
 	);
 }

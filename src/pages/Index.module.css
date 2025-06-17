@@ -1,0 +1,52 @@
+.main {
+	gap: 8px;
+	height: 100%;
+	width: 100%;
+	max-width: 512px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	padding: 16px;
+}
+
+.step {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 16px;
+	width: 100%;
+	padding: 16px;
+	border-radius: 16px;
+	border: 2px solid var(--color-border);
+	animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.controls {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.btnCluster {
+	display: flex;
+	flex-direction: row;
+	width: fit-content;
+	gap: 8px;
+}
+
+.title {
+	margin: 32px;
+}

@@ -27,12 +27,12 @@
 }
 
 .primary {
-	background-color: #007bff;
+	background-color: var(--color-primary);
 	color: #fff;
 }
 
 .primary:hover:enabled {
-	background-color: #006fe6;
+	background-color: var(--color-primary-hover);
 	color: #fff;
 }
 
@@ -44,13 +44,5 @@
 
 	.secondary:hover:enabled {
 		background-color: #333333;
-	}
-
-	.primary {
-		background-color: #0056b3;
-	}
-
-	.primary:hover:enabled {
-		background-color: #0063cc;
 	}
 }

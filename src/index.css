@@ -1,41 +1,115 @@
-html,
-body {
-	height: 100%;
-	margin: 0;
-	padding: 0;
-}
-
-body {
-	background-color: #fff;
-}
-
-#root {
-	max-width: 512px;
-	width: calc(100% - 32px);
-	margin: 0 auto;
-	text-align: center;
+:root {
+	background-color: var(--color-background);
 	font-family: Helvetica, Arial, sans-serif;
-	display: grid;
-	grid-template-rows: 1fr auto;
-	height: 100%;
-	padding: 0;
-	align-content: center;
-}
+	font-size: 16px;
+	line-height: 1.5;
 
-.box {
-	padding: 8px;
-	border: 1.5px solid #f2f2f2;
-	border-radius: 8px;
-	width: calc(100% - 16px);
+	--color-border: #f2f2f2;
+	--color-primary: #ac2b37;
+	--color-primary-hover: #b33a45;
+	--color-background: #fff;
 }
 
 @media (prefers-color-scheme: dark) {
 	body {
-		background-color: #1a1a1a;
 		color: #fff;
+		--color-border: #262626;
+		--color-background: #1a1a1a;
 	}
+}
 
-	.box {
-		border-color: #262626;
-	}
+/*================================ CSS Reset ================================*/
+
+/* Sourced from https://piccalil.li/blog/a-more-modern-css-reset/ */
+
+/* Box sizing rules */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+/* Prevent font size inflation */
+html {
+	-moz-text-size-adjust: none;
+	-webkit-text-size-adjust: none;
+	text-size-adjust: none;
+}
+
+/* Remove default margin in favour of better control in authored CSS */
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
+	margin: 0;
+	margin-block-end: 0;
+}
+
+/* Remove list styles on ul, ol elements with a list role, which suggests default styling will be removed */
+ul[role="list"],
+ol[role="list"] {
+	list-style: none;
+}
+
+/* Set core body defaults */
+body {
+	min-height: 100vh;
+	line-height: 1.5;
+}
+
+/* Set shorter line heights on headings and interactive elements */
+h1,
+h2,
+h3,
+h4,
+button,
+input,
+label {
+	line-height: 1.1;
+}
+
+/* Balance text wrapping on headings */
+h1,
+h2,
+h3,
+h4 {
+	text-wrap: balance;
+}
+
+/* A elements that don't have a class get default styles */
+a:not([class]) {
+	color: currentColor;
+	text-decoration-skip-ink: auto;
+}
+
+/* Make images easier to work with */
+img,
+picture {
+	display: block;
+	max-width: 100%;
+}
+
+/* Inherit fonts for inputs and buttons */
+input,
+button,
+textarea,
+select {
+	font-size: inherit;
+	font-family: inherit;
+}
+
+/* Make sure textareas without a rows attribute are not tiny */
+textarea:not([rows]) {
+	min-height: 10em;
+}
+
+/* Anything that has been anchored to should have extra scroll margin */
+:target {
+	scroll-margin-block: 5ex;
 }

@@ -16,7 +16,10 @@ const toastVariants = cva(styles.toast, {
 export function Toast({ type, message }: ToastProps) {
 	return (
 		<div className={toastVariants({ type })}>
-			<AlertTriangle size={14} />
+			<div className={styles.header}>
+				<AlertTriangle size={18} /> Error
+			</div>
+
 			{message}
 		</div>
 	);
