@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { parseSheet } from "../lib/parser";
 import { Download, HelpCircle } from "feather-icons-react";
 import { Schedule } from "../lib/schedule";
@@ -18,6 +18,15 @@ export function IndexPage() {
 	const [showState, setShowState] = useState<ShowState>(ShowState.None);
 	const [schedule, setSchedule] = useState<Schedule | null>(null);
 	const [error, setError] = useState<Error | null>(null);
+	const [step, setStep] = useState<number>(1);
+
+	useEffect(() => {
+		if (schedule) {
+			setStep(2);
+		} else {
+			setStep(1);
+		}
+	}, [schedule]);
 
 	const onInfoPressed = () => {
 		if (showState === ShowState.Info) setShowState(ShowState.None);
@@ -63,24 +72,25 @@ export function IndexPage() {
 	return (
 		<>
 			<main className={styles.main}>
-				<h1>Convert your WPI Workday schedule to ICS 🗓️</h1>
-
 				{error && (
 					<Toast
 						type="error"
-						message={
-							"Failed to parse schedule. Did you upload the correct file?"
-						}
+						message={"Failed to parse file. It could be the wrong one."}
 					/>
 				)}
 
-				<div className={`${styles.controls} box`}>
-					<FilePicker accept=".xlsx" onChange={onFileChange} />
+				{step == 1 && (
+					<div className={styles.step}>
+						<h2>Step 1</h2>
+						<p>Upload your registered classes spreadsheet</p>
+						<FilePicker accept=".xlsx" onChange={onFileChange} />
+					</div>
+				)}
 
-					<div className={styles.btnCluster}>
-						<Button onClick={onInfoPressed} intent="secondary">
-							<HelpCircle size={20} /> Help
-						</Button>
+				{step == 2 && (
+					<div className={styles.step}>
+						<h2>Step 2</h2>
+						<p>Download calendar and import into any calendar app</p>
 						<Button
 							disabled={!schedule}
 							onClick={downloadFile}
@@ -89,7 +99,7 @@ export function IndexPage() {
 							<Download size={20} /> Download
 						</Button>
 					</div>
-				</div>
+				)}
 
 				{showState === ShowState.Info && <Instructions />}
 			</main>
