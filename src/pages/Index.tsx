@@ -1,17 +1,18 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { parseSheet } from "../lib/parser";
-import { ArrowLeft, Check, Download, HelpCircle, X } from "feather-icons-react";
+import { ArrowLeft, Check, Download, HelpCircle } from "feather-icons-react";
 import { Schedule } from "../lib/schedule";
 import { Toast } from "../components/Toast/Toast";
 import { sheetToArray } from "../lib/sheet";
-import { Instructions } from "../components/Instructions/Instructions";
 import { Button } from "../components/Button/Button";
 import { FilePicker } from "../components/FilePicker/FilePicker";
 import styles from "./Index.module.css";
 import { Dialog } from "../components/Dialog/Dialog";
+import { Link } from "../components/Link/Link";
 
 enum DialogState {
-	Info,
+	ObtainingInfo,
+	ImportingInfo,
 	None,
 }
 
@@ -28,10 +29,6 @@ export function IndexPage() {
 			setStep(1);
 		}
 	}, [schedule]);
-
-	const onInfoPressed = () => {
-		setShowState(DialogState.Info);
-	};
 
 	const closeDialog = () => {
 		setShowState(DialogState.None);
@@ -89,7 +86,10 @@ export function IndexPage() {
 						<p>Upload your registered classes spreadsheet</p>
 						<div className={styles.btnCluster}>
 							<FilePicker accept=".xlsx" onChange={onFileChange} />
-							<Button intent="secondary" onClick={onInfoPressed}>
+							<Button
+								intent="secondary"
+								onClick={() => setShowState(DialogState.ObtainingInfo)}
+							>
 								<HelpCircle size={20} /> Help
 							</Button>
 						</div>
@@ -115,11 +115,17 @@ export function IndexPage() {
 							>
 								<Download size={20} /> Download
 							</Button>
+							<Button
+								intent="secondary"
+								onClick={() => setShowState(DialogState.ImportingInfo)}
+							>
+								<HelpCircle /> Help
+							</Button>
 						</div>
 					</div>
 				)}
 
-				{showState === DialogState.Info && (
+				{showState === DialogState.ObtainingInfo && (
 					<Dialog>
 						<h2>Obtaining your spreadsheet</h2>
 						<p>
@@ -131,6 +137,32 @@ export function IndexPage() {
 							<code>.xlsx</code> spreadsheet.
 						</p>
 
+						<Button intent="secondary" onClick={closeDialog}>
+							<Check size={20} />
+							Got it
+						</Button>
+					</Dialog>
+				)}
+
+				{showState === DialogState.ImportingInfo && (
+					<Dialog>
+						<h2>Importing your calendar</h2>
+						<p>
+							Opening the file directly should open it in your default calendar
+							app. If not, Below are links to detailed instructions for each
+							platform.
+						</p>
+						<div>
+							<Link href="https://support.google.com/calendar/answer/37118?hl=en&co=GENIE.Platform%3DDesktop&oco=1">
+								Google Calendar
+							</Link>
+							<Link href="https://support.microsoft.com/en-us/office/import-calendars-into-outlook-8e8364e1-400e-4c0f-a573-fe76b5a2d379">
+								Outlook
+							</Link>
+							<Link href="https://support.apple.com/guide/calendar/import-or-export-calendars-icl1023/mac">
+								Apple Calendar (Mac)
+							</Link>
+						</div>
 						<Button intent="secondary" onClick={closeDialog}>
 							<Check size={20} />
 							Got it
