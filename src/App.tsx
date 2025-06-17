@@ -4,7 +4,6 @@ import styles from "./App.module.css";
 export function App() {
 	return (
 		<div className={styles.centeredContainer}>
-			<h1>WPI Calendar Generator</h1>
 			<IndexPage />
 			<footer className={styles.footer}>
 				<div className={styles.footerRow}>

@@ -73,6 +73,8 @@ export function IndexPage() {
 	return (
 		<>
 			<main className={styles.main}>
+				<h1 className={styles.title}>WPI Calendar Generator</h1>
+
 				{error && (
 					<Toast
 						type="error"
