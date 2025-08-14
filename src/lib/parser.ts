@@ -211,8 +211,8 @@ export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
 		const minDiff = Math.min(...diffs);
 
 		if (minDiff !== 0) {
-			startDate = startDate.plus({ day: minDiff });
-			endDate = endDate.plus({ day: minDiff });
+			startDate = startDate.plus({ days: minDiff });
+			endDate = endDate.plus({ days: minDiff });
 		}
 
 		schedule.addSection({
