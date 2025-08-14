@@ -1,4 +1,5 @@
 import { CalendarOptions, ICalendar } from "datebook";
+import { DateTime } from "luxon";
 
 export enum Weekdays {
 	Sunday = 7,
@@ -24,13 +25,13 @@ export interface Section {
 	days: Weekdays[];
 
 	/** Start of first section */
-	start: Date;
+	start: DateTime;
 
 	/** End of first section */
-	end: Date;
+	end: DateTime;
 
 	/** Last date of the event */
-	lastDate: Date;
+	lastDate: DateTime;
 }
 
 export class Schedule {
@@ -67,12 +68,12 @@ export class Schedule {
 				title: section.name,
 				location: section.location,
 				description: section.description,
-				start: section.start,
-				end: section.end,
+				start: section.start.toJSDate(),
+				end: section.end.toJSDate(),
 				recurrence: {
 					frequency: "DAILY",
 					weekdays: weekdays,
-					end: section.lastDate,
+					end: section.lastDate.toJSDate(),
 				},
 			};
 

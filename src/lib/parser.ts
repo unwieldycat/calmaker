@@ -236,9 +236,9 @@ export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
 			description: courseFullName,
 			location,
 			days,
-			start: startDate.toJSDate(),
-			end: endDate.toJSDate(),
-			lastDate: lastDate.toJSDate(),
+			start: startDate,
+			end: endDate,
+			lastDate: lastDate,
 		});
 	}
 
