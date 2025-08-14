@@ -215,18 +215,18 @@ export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
 
 		// Adjust the start date/end date so that the event falls on the first
 		// session of the section
-		for (const day of days) {
-			if (day >= startDate.day) {
-				const diff = day - startDate.day;
-				if (diff !== 0) {
-					startDate = startDate.set({ day: startDate.day + diff });
-					endDate = endDate.set({ day: endDate.day + diff });
-				}
-				break;
-			} else if (day < startDate.day) {
-				const diff = 7 - startDate.day + day;
+		for (const weekday of days) {
+			if (weekday > startDate.weekday) {
+				const diff = weekday - startDate.weekday;
 				startDate = startDate.set({ day: startDate.day + diff });
 				endDate = endDate.set({ day: endDate.day + diff });
+				break;
+			} else if (weekday < startDate.weekday) {
+				const diff = 7 - startDate.weekday + weekday;
+				startDate = startDate.set({ day: startDate.day + diff });
+				endDate = endDate.set({ day: endDate.day + diff });
+				break;
+			} else {
 				break;
 			}
 		}
