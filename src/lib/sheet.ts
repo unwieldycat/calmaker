@@ -1,6 +1,7 @@
+import { DateTime } from "luxon";
 import { WorkSheet } from "xlsx";
 
-export type CellValue = string | number | boolean | Date | null;
+export type CellValue = string | number | boolean | DateTime | null;
 
 /**
  * Turn an XLSX Worksheet into a 2D array.
@@ -19,8 +20,16 @@ export function sheetToArray(sheet: WorkSheet): CellValue[][] {
 		const row: CellValue[] = [];
 
 		for (const i in sheetRow) {
-			if (sheetRow[i]?.v) row[i] = sheetRow[i].v;
-			else row[i] = null;
+			if (sheetRow[i]?.v instanceof Date) {
+				const asDateTime = DateTime.fromJSDate(sheetRow[i].v, {
+					zone: "America/New_York",
+				});
+				row[i] = asDateTime;
+			} else if (sheetRow[i]?.v) {
+				row[i] = sheetRow[i].v;
+			} else {
+				row[i] = null;
+			}
 		}
 
 		data.push(row);

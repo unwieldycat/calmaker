@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { Schedule, Weekdays } from "./schedule";
 import { CellValue } from "./sheet";
 
@@ -192,44 +193,52 @@ export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
 			row[dataColumns[Columns.MEETING_PATTERNS]]
 		);
 
-		const startDate = row[dataColumns[Columns.START_DATE]];
-		const lastDate = row[dataColumns[Columns.END_DATE]];
-		if (!(startDate instanceof Date))
+		let startDate = row[dataColumns[Columns.START_DATE]];
+		let lastDate = row[dataColumns[Columns.END_DATE]];
+
+		if (!(startDate instanceof DateTime))
 			throw new ParseError("startDate is not a Date");
-		if (!(lastDate instanceof Date))
+		if (!(lastDate instanceof DateTime))
 			throw new ParseError("lastDate is not a Date");
 
-		const endDate = new Date(startDate);
+		startDate = startDate.set({
+			hour: startTime[0],
+			minute: startTime[1],
+			second: 0,
+		});
+
+		let endDate = startDate.set({
+			hour: endTime[0],
+			minute: endTime[1],
+			second: 0,
+		});
 
 		// Adjust the start date/end date so that the event falls on the first
 		// session of the section
 		for (const day of days) {
-			if (day >= startDate.getDay()) {
-				const diff = day - startDate.getDay();
+			if (day >= startDate.day) {
+				const diff = day - startDate.day;
 				if (diff !== 0) {
-					startDate.setDate(startDate.getDate() + diff);
-					endDate.setDate(endDate.getDate() + diff);
+					startDate = startDate.set({ day: startDate.day + diff });
+					endDate = endDate.set({ day: endDate.day + diff });
 				}
 				break;
-			} else if (day < startDate.getDay()) {
-				const diff = 7 - startDate.getDay() + day;
-				startDate.setDate(startDate.getDate() + diff);
-				endDate.setDate(endDate.getDate() + diff);
+			} else if (day < startDate.day) {
+				const diff = 7 - startDate.day + day;
+				startDate = startDate.set({ day: startDate.day + diff });
+				endDate = endDate.set({ day: endDate.day + diff });
 				break;
 			}
 		}
-
-		addTimeToDate(startDate, startTime);
-		addTimeToDate(endDate, endTime);
 
 		schedule.addSection({
 			name: `${courseId} ${courseFormat}`,
 			description: courseFullName,
 			location,
 			days,
-			start: startDate,
-			end: endDate,
-			lastDate: lastDate,
+			start: startDate.toJSDate(),
+			end: endDate.toJSDate(),
+			lastDate: lastDate.toJSDate(),
 		});
 	}
 
