@@ -1,13 +1,13 @@
 import { CalendarOptions, ICalendar } from "datebook";
 
 export enum Weekdays {
-	Sunday = 1,
-	Monday = 2,
-	Tuesday = 3,
-	Wednesday = 4,
-	Thursday = 5,
-	Friday = 6,
-	Saturday = 7,
+	Sunday = 7,
+	Monday = 1,
+	Tuesday = 2,
+	Wednesday = 3,
+	Thursday = 4,
+	Friday = 5,
+	Saturday = 6,
 }
 
 export interface Section {
@@ -60,7 +60,7 @@ export class Schedule {
 
 		for (const section of this._sections) {
 			const weekdays = section.days.map(
-				(id) => ["SU", "MO", "TU", "WE", "TH", "FR", "SA"][id]
+				(id) => ["MO", "TU", "WE", "TH", "FR", "SA", "SU"][id - 1]
 			);
 
 			const event: CalendarOptions = {
