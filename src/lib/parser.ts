@@ -140,17 +140,6 @@ function parseMeetingPattern(patternCell: CellValue) {
 }
 
 /**
- * Add time array to date
- * @param date Date
- * @param time Time array [hours, minutes]
- */
-function addTimeToDate(date: Date, time: number[]) {
-	date.setHours(time[0]);
-	date.setMinutes(time[1]);
-	date.setSeconds(0);
-}
-
-/**
  * Parse a sheet into a schedule
  * @param sheet XLSX Worksheet to parse
  * @returns A schedule object
@@ -220,8 +209,11 @@ export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
 			return diff;
 		});
 		const minDiff = Math.min(...diffs);
-		startDate = startDate.set({ day: startDate.day + minDiff });
-		endDate = endDate.set({ day: endDate.day + minDiff });
+
+		if (minDiff !== 0) {
+			startDate = startDate.plus({ day: minDiff });
+			endDate = endDate.plus({ day: minDiff });
+		}
 
 		schedule.addSection({
 			name: `${courseId} ${courseFormat}`,
