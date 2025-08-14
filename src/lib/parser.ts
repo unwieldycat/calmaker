@@ -193,13 +193,13 @@ export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
 			row[dataColumns[Columns.MEETING_PATTERNS]]
 		);
 
-		let startDate = row[dataColumns[Columns.START_DATE]];
-		let lastDate = row[dataColumns[Columns.END_DATE]];
-
-		if (!(startDate instanceof DateTime))
+		if (!(row[dataColumns[Columns.START_DATE]] instanceof DateTime))
 			throw new ParseError("startDate is not a Date");
-		if (!(lastDate instanceof DateTime))
+		if (!(row[dataColumns[Columns.END_DATE]] instanceof DateTime))
 			throw new ParseError("lastDate is not a Date");
+
+		let startDate = row[dataColumns[Columns.START_DATE]] as DateTime;
+		let lastDate = row[dataColumns[Columns.END_DATE]] as DateTime;
 
 		startDate = startDate.set({
 			hour: startTime[0],
@@ -215,21 +215,13 @@ export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
 
 		// Adjust the start date/end date so that the event falls on the first
 		// session of the section
-		for (const weekday of days) {
-			if (weekday > startDate.weekday) {
-				const diff = weekday - startDate.weekday;
-				startDate = startDate.set({ day: startDate.day + diff });
-				endDate = endDate.set({ day: endDate.day + diff });
-				break;
-			} else if (weekday < startDate.weekday) {
-				const diff = 7 - startDate.weekday + weekday;
-				startDate = startDate.set({ day: startDate.day + diff });
-				endDate = endDate.set({ day: endDate.day + diff });
-				break;
-			} else {
-				break;
-			}
-		}
+		const diffs = days.map((weekday) => {
+			const diff = (weekday - startDate.weekday + 7) % 7;
+			return diff;
+		});
+		const minDiff = Math.min(...diffs);
+		startDate = startDate.set({ day: startDate.day + minDiff });
+		endDate = endDate.set({ day: endDate.day + minDiff });
 
 		schedule.addSection({
 			name: `${courseId} ${courseFormat}`,
