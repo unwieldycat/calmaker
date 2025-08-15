@@ -105,6 +105,11 @@ export function IndexPage() {
 							Download the <code>.ics</code> file and import it into your
 							calendar
 						</p>
+						<p>
+							<b>Note:</b> Create a separate calendar for your classes and
+							cross-check with your Workday schedule in case of incorrect
+							output.
+						</p>
 
 						<div className={styles.btnCluster}>
 							<Button intent="secondary" onClick={() => setSchedule(null)}>
