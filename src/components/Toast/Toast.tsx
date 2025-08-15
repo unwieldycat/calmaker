@@ -1,6 +1,7 @@
 import { AlertTriangle, Info } from "feather-icons-react";
 import { cva } from "class-variance-authority";
 import styles from "./Toast.module.css";
+import { ReactNode } from "react";
 
 const toastVariants = cva(styles.toast, {
 	variants: {
@@ -37,5 +38,5 @@ export function Toast({ type, message }: ToastProps) {
 
 export interface ToastProps {
 	type: "error" | "info";
-	message: string;
+	message: ReactNode;
 }
