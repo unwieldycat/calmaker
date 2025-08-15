@@ -28,21 +28,24 @@ enum Columns {
 const endOfRowCells = ["My Dropped/Withdrawn Courses", "My Completed Courses"];
 
 /**
- * Find the header row in the sheet data
+ * Find the header rows in the sheet data
  * @param sheetData 2D array of strings representing the sheet data
- * @returns Header row index
+ * @returns Header row indexes
  */
-export function findHeaderRow(sheetData: CellValue[][]): number {
-	let headerRow;
+export function findHeaderRows(sheetData: CellValue[][]): number[] {
+	let headerRows: number[] = [];
+
 	for (let r = 0; r < sheetData.length; r++) {
 		const row = sheetData[r];
 		if (row[0] === "My Enrolled Courses") {
-			headerRow = r + 2;
-			break;
+			headerRows.push(r + 2);
 		}
 	}
-	if (!headerRow) throw new ParseError("Unable to find the header row");
-	return headerRow;
+
+	if (headerRows.length === 0)
+		throw new ParseError("Unable to find header row(s)");
+
+	return headerRows;
 }
 
 /**
@@ -145,31 +148,34 @@ function parseMeetingPattern(patternCell: CellValue) {
  * @returns A schedule object
  */
 export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
-	const headerRow = findHeaderRow(sheetData);
-	const dataColumns = findColumns(
-		[
-			Columns.COURSE_LISTING,
-			Columns.INSTRUCTIONAL_FORMAT,
-			Columns.MEETING_PATTERNS,
-			Columns.START_DATE,
-			Columns.END_DATE,
-			Columns.INSTRUCTOR,
-		],
-		headerRow,
-		sheetData
-	);
+	const headerRows = findHeaderRows(sheetData);
 
 	const schedule = new Schedule();
 
-	for (let r = headerRow + 1; r < sheetData.length; r++) {
-		const row = sheetData[r];
+	for (const headerRow of headerRows) {
+		const dataColumns = findColumns(
+			[
+				Columns.COURSE_LISTING,
+				Columns.INSTRUCTIONAL_FORMAT,
+				Columns.MEETING_PATTERNS,
+				Columns.START_DATE,
+				Columns.END_DATE,
+				Columns.INSTRUCTOR,
+			],
+			headerRow,
+			sheetData
+		);
 
-		// Stop parsing if the extended version of this sheet is reached
-		if (typeof row[0] == "string" && endOfRowCells.indexOf(row[0]) !== -1)
-			break;
+		for (let r = headerRow + 1; r < sheetData.length; r++) {
+			const row = sheetData[r];
 
-		let section = await parseRow(dataColumns, row);
-		schedule.addSection(section);
+			// Stop parsing if the extended version of this sheet is reached
+			if (typeof row[0] == "string" && endOfRowCells.indexOf(row[0]) !== -1)
+				break;
+
+			let section = await parseRow(dataColumns, row);
+			schedule.addSection(section);
+		}
 	}
 
 	return schedule;
