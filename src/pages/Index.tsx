@@ -78,7 +78,7 @@ export function IndexPage() {
 				{error && (
 					<Toast
 						type="error"
-						message={"Failed to parse file. It could be the wrong one."}
+						message={<p>Failed to parse file. It could be the wrong one.</p>}
 					/>
 				)}
 
@@ -99,32 +99,47 @@ export function IndexPage() {
 				)}
 
 				{step == 2 && (
-					<div className={styles.step}>
-						<h2>Step 2</h2>
-						<p>
-							Download the <code>.ics</code> file and import it into your
-							calendar
-						</p>
+					<>
+						<Toast
+							type="info"
+							message={
+								<p>
+									Bad output?{" "}
+									<a href="https://github.com/unwieldycat/calmaker/issues">
+										Create a GitHub issue
+									</a>{" "}
+									or contact me!
+								</p>
+							}
+						/>
+						<div className={styles.step}>
+							<h2>Step 2</h2>
+							<p>
+								Download the <code>.ics</code> file and import it into a new
+								calendar. Cross-check with your Workday schedule in case of
+								incorrect output.
+							</p>
 
-						<div className={styles.btnCluster}>
-							<Button intent="secondary" onClick={() => setSchedule(null)}>
-								<ArrowLeft size={20} /> Done
-							</Button>
-							<Button
-								disabled={!schedule}
-								onClick={downloadFile}
-								intent="primary"
-							>
-								<Download size={20} /> Download
-							</Button>
-							<Button
-								intent="secondary"
-								onClick={() => setShowState(DialogState.ImportingInfo)}
-							>
-								<HelpCircle /> Help
-							</Button>
+							<div className={styles.btnCluster}>
+								<Button intent="secondary" onClick={() => setSchedule(null)}>
+									<ArrowLeft size={20} /> Done
+								</Button>
+								<Button
+									disabled={!schedule}
+									onClick={downloadFile}
+									intent="primary"
+								>
+									<Download size={20} /> Download
+								</Button>
+								<Button
+									intent="secondary"
+									onClick={() => setShowState(DialogState.ImportingInfo)}
+								>
+									<HelpCircle /> Help
+								</Button>
+							</div>
 						</div>
-					</div>
+					</>
 				)}
 
 				{showState === DialogState.ObtainingInfo && (

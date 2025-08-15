@@ -1,4 +1,5 @@
-import { Schedule, Weekdays } from "./schedule";
+import { DateTime } from "luxon";
+import { Schedule, Section, Weekdays } from "./schedule";
 import { CellValue } from "./sheet";
 
 /**
@@ -27,21 +28,24 @@ enum Columns {
 const endOfRowCells = ["My Dropped/Withdrawn Courses", "My Completed Courses"];
 
 /**
- * Find the header row in the sheet data
+ * Find the header rows in the sheet data
  * @param sheetData 2D array of strings representing the sheet data
- * @returns Header row index
+ * @returns Header row indexes
  */
-export function findHeaderRow(sheetData: CellValue[][]): number {
-	let headerRow;
+export function findHeaderRows(sheetData: CellValue[][]): number[] {
+	let headerRows: number[] = [];
+
 	for (let r = 0; r < sheetData.length; r++) {
 		const row = sheetData[r];
 		if (row[0] === "My Enrolled Courses") {
-			headerRow = r + 2;
-			break;
+			headerRows.push(r + 2);
 		}
 	}
-	if (!headerRow) throw new ParseError("Unable to find the header row");
-	return headerRow;
+
+	if (headerRows.length === 0)
+		throw new ParseError("Unable to find header row(s)");
+
+	return headerRows;
 }
 
 /**
@@ -139,99 +143,108 @@ function parseMeetingPattern(patternCell: CellValue) {
 }
 
 /**
- * Add time array to date
- * @param date Date
- * @param time Time array [hours, minutes]
- */
-function addTimeToDate(date: Date, time: number[]) {
-	date.setHours(time[0]);
-	date.setMinutes(time[1]);
-	date.setSeconds(0);
-}
-
-/**
  * Parse a sheet into a schedule
  * @param sheet XLSX Worksheet to parse
  * @returns A schedule object
  */
 export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
-	const headerRow = findHeaderRow(sheetData);
-	const dataColumns = findColumns(
-		[
-			Columns.COURSE_LISTING,
-			Columns.INSTRUCTIONAL_FORMAT,
-			Columns.MEETING_PATTERNS,
-			Columns.START_DATE,
-			Columns.END_DATE,
-			Columns.INSTRUCTOR,
-		],
-		headerRow,
-		sheetData
-	);
+	const headerRows = findHeaderRows(sheetData);
 
 	const schedule = new Schedule();
 
-	for (let r = headerRow + 1; r < sheetData.length; r++) {
-		const row = sheetData[r];
-
-		// Stop parsing if the extended version of this sheet is reached
-		if (typeof row[0] == "string" && endOfRowCells.indexOf(row[0]) !== -1)
-			break;
-
-		let [courseId, courseFullName] = parseCourseName(
-			row[dataColumns[Columns.COURSE_LISTING]]
+	for (const headerRow of headerRows) {
+		const dataColumns = findColumns(
+			[
+				Columns.COURSE_LISTING,
+				Columns.INSTRUCTIONAL_FORMAT,
+				Columns.MEETING_PATTERNS,
+				Columns.START_DATE,
+				Columns.END_DATE,
+				Columns.INSTRUCTOR,
+			],
+			headerRow,
+			sheetData
 		);
 
-		const courseFormat = row[dataColumns[Columns.INSTRUCTIONAL_FORMAT]];
-		const instructor = row[dataColumns[Columns.INSTRUCTOR]];
-		if (instructor && typeof instructor == "string") {
-			courseFullName += ` with ${instructor}`;
-		}
+		for (let r = headerRow + 1; r < sheetData.length; r++) {
+			const row = sheetData[r];
 
-		const [days, startTime, endTime, location] = parseMeetingPattern(
-			row[dataColumns[Columns.MEETING_PATTERNS]]
-		);
-
-		const startDate = row[dataColumns[Columns.START_DATE]];
-		const lastDate = row[dataColumns[Columns.END_DATE]];
-		if (!(startDate instanceof Date))
-			throw new ParseError("startDate is not a Date");
-		if (!(lastDate instanceof Date))
-			throw new ParseError("lastDate is not a Date");
-
-		const endDate = new Date(startDate);
-
-		// Adjust the start date/end date so that the event falls on the first
-		// session of the section
-		for (const day of days) {
-			if (day >= startDate.getDay()) {
-				const diff = day - startDate.getDay();
-				if (diff !== 0) {
-					startDate.setDate(startDate.getDate() + diff);
-					endDate.setDate(endDate.getDate() + diff);
-				}
+			// Stop parsing if the extended version of this sheet is reached
+			if (typeof row[0] == "string" && endOfRowCells.indexOf(row[0]) !== -1)
 				break;
-			} else if (day < startDate.getDay()) {
-				const diff = 7 - startDate.getDay() + day;
-				startDate.setDate(startDate.getDate() + diff);
-				endDate.setDate(endDate.getDate() + diff);
-				break;
-			}
+
+			let section = await parseRow(dataColumns, row);
+			schedule.addSection(section);
 		}
-
-		addTimeToDate(startDate, startTime);
-		addTimeToDate(endDate, endTime);
-
-		schedule.addSection({
-			name: `${courseId} ${courseFormat}`,
-			description: courseFullName,
-			location,
-			days,
-			start: startDate,
-			end: endDate,
-			lastDate: lastDate,
-		});
 	}
 
 	return schedule;
+}
+
+/**
+ * Parse a row of the sheet
+ * @param dataColumns Column indexes
+ * @param row Row data
+ * @returns Section object
+ */
+async function parseRow(
+	dataColumns: Record<string, number>,
+	row: CellValue[]
+): Promise<Section> {
+	let [courseId, courseFullName] = parseCourseName(
+		row[dataColumns[Columns.COURSE_LISTING]]
+	);
+
+	const courseFormat = row[dataColumns[Columns.INSTRUCTIONAL_FORMAT]];
+	const instructor = row[dataColumns[Columns.INSTRUCTOR]];
+	if (instructor && typeof instructor == "string") {
+		courseFullName += ` with ${instructor}`;
+	}
+
+	const [days, startTime, endTime, location] = parseMeetingPattern(
+		row[dataColumns[Columns.MEETING_PATTERNS]]
+	);
+
+	if (!(row[dataColumns[Columns.START_DATE]] instanceof DateTime))
+		throw new ParseError("startDate is not a Date");
+	if (!(row[dataColumns[Columns.END_DATE]] instanceof DateTime))
+		throw new ParseError("lastDate is not a Date");
+
+	let startDate = row[dataColumns[Columns.START_DATE]] as DateTime;
+	let lastDate = row[dataColumns[Columns.END_DATE]] as DateTime;
+
+	startDate = startDate.set({
+		hour: startTime[0],
+		minute: startTime[1],
+		second: 0,
+	});
+
+	let endDate = startDate.set({
+		hour: endTime[0],
+		minute: endTime[1],
+		second: 0,
+	});
+
+	// Adjust the start date/end date so that the event falls on the first
+	// session of the section
+	const diffs = days.map((weekday) => {
+		const diff = (weekday - startDate.weekday + 7) % 7;
+		return diff;
+	});
+	const minDiff = Math.min(...diffs);
+
+	if (minDiff !== 0) {
+		startDate = startDate.plus({ days: minDiff });
+		endDate = endDate.plus({ days: minDiff });
+	}
+
+	return {
+		name: `${courseId} ${courseFormat}`,
+		description: courseFullName,
+		location,
+		days,
+		start: startDate,
+		end: endDate,
+		lastDate: lastDate,
+	};
 }

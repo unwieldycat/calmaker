@@ -1,13 +1,14 @@
 import { CalendarOptions, ICalendar } from "datebook";
+import { DateTime } from "luxon";
 
 export enum Weekdays {
-	Sunday = 1,
-	Monday = 2,
-	Tuesday = 3,
-	Wednesday = 4,
-	Thursday = 5,
-	Friday = 6,
-	Saturday = 7,
+	Sunday = 7,
+	Monday = 1,
+	Tuesday = 2,
+	Wednesday = 3,
+	Thursday = 4,
+	Friday = 5,
+	Saturday = 6,
 }
 
 export interface Section {
@@ -24,13 +25,13 @@ export interface Section {
 	days: Weekdays[];
 
 	/** Start of first section */
-	start: Date;
+	start: DateTime;
 
 	/** End of first section */
-	end: Date;
+	end: DateTime;
 
 	/** Last date of the event */
-	lastDate: Date;
+	lastDate: DateTime;
 }
 
 export class Schedule {
@@ -60,19 +61,19 @@ export class Schedule {
 
 		for (const section of this._sections) {
 			const weekdays = section.days.map(
-				(id) => ["SU", "MO", "TU", "WE", "TH", "FR", "SA"][id]
+				(id) => ["MO", "TU", "WE", "TH", "FR", "SA", "SU"][id - 1]
 			);
 
 			const event: CalendarOptions = {
 				title: section.name,
 				location: section.location,
 				description: section.description,
-				start: section.start,
-				end: section.end,
+				start: section.start.toJSDate(),
+				end: section.end.toJSDate(),
 				recurrence: {
 					frequency: "DAILY",
 					weekdays: weekdays,
-					end: section.lastDate,
+					end: section.lastDate.toJSDate(),
 				},
 			};
 
