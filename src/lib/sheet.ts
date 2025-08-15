@@ -21,9 +21,20 @@ export function sheetToArray(sheet: WorkSheet): CellValue[][] {
 
 		for (const i in sheetRow) {
 			if (sheetRow[i]?.v instanceof Date) {
-				const asDateTime = DateTime.fromJSDate(sheetRow[i].v, {
-					zone: "America/New_York",
-				});
+				const jsDate = sheetRow[i].v;
+
+				// SheetJS sets the Date as if the value were UTC, but it
+				// should in fact be in America/New_York. This causes some off
+				// by one date issues sometimes.
+				const asDateTime = DateTime.fromObject(
+					{
+						year: jsDate.getUTCFullYear(),
+						month: jsDate.getUTCMonth() + 1,
+						day: jsDate.getUTCDate(),
+					},
+					{ zone: "America/New_York" }
+				);
+
 				row[i] = asDateTime;
 			} else if (sheetRow[i]?.v) {
 				row[i] = sheetRow[i].v;
