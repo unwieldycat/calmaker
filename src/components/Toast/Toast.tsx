@@ -1,4 +1,4 @@
-import { AlertTriangle, Info } from "feather-icons-react";
+import { AlertOctagon, AlertTriangle, Info } from "feather-icons-react";
 import { cva } from "class-variance-authority";
 import styles from "./Toast.module.css";
 import { ReactNode } from "react";
@@ -22,7 +22,7 @@ export function Toast({ type, message }: ToastProps) {
 			<div className={styles.header}>
 				{type === "error" && (
 					<>
-						<AlertTriangle size={18} /> Error
+						<AlertOctagon size={18} /> Error
 					</>
 				)}
 				{type === "info" && (
