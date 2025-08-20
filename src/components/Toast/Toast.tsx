@@ -8,6 +8,7 @@ const toastVariants = cva(styles.toast, {
 		type: {
 			error: styles.error,
 			info: styles.info,
+			warning: styles.warning,
 		},
 	},
 	defaultVariants: {
@@ -29,6 +30,11 @@ export function Toast({ type, message }: ToastProps) {
 						<Info size={18} /> Info
 					</>
 				)}
+				{type === "warning" && (
+					<>
+						<AlertTriangle size={18} /> Warning
+					</>
+				)}
 			</div>
 
 			{message}
@@ -37,6 +43,6 @@ export function Toast({ type, message }: ToastProps) {
 }
 
 export interface ToastProps {
-	type: "error" | "info";
+	type: "error" | "info" | "warning";
 	message: ReactNode;
 }
