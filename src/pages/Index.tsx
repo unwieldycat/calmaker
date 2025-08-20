@@ -75,6 +75,16 @@ export function IndexPage() {
 			<main className={styles.main}>
 				<h1 className={styles.title}>WPI Calendar Generator</h1>
 
+				<Toast
+					type="warning"
+					message={
+						<p>
+							This tool doesn't currently account for modified schedule days.
+							You'll need to manually adjust your calendar afterward.
+						</p>
+					}
+				/>
+
 				{error && (
 					<Toast
 						type="error"
