@@ -213,6 +213,9 @@ async function parseRow(
 	let startDate = row[dataColumns[Columns.START_DATE]] as DateTime;
 	let lastDate = row[dataColumns[Columns.END_DATE]] as DateTime;
 
+	// Make the cutoff 12AM the next day so no sections are excluded
+	lastDate = lastDate.plus({ days: 1 });
+
 	startDate = startDate.set({
 		hour: startTime[0],
 		minute: startTime[1],
