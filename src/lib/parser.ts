@@ -25,7 +25,11 @@ enum Columns {
 	INSTRUCTOR = "Instructor",
 }
 
-const endOfRowCells = ["My Dropped/Withdrawn Courses", "My Completed Courses"];
+const endOfRowCells = [
+	"My Dropped/Withdrawn Courses",
+	"My Completed Courses",
+	"Enrolled Credits",
+];
 
 /**
  * Find the header rows in the sheet data
@@ -119,7 +123,7 @@ function parseCourseName(courseNameCell: CellValue) {
  * @param patternCell Cell data
  * @returns Days, startTime, endTime, and location
  */
-function parseMeetingPattern(patternCell: CellValue) {
+async function parseMeetingPattern(patternCell: CellValue) {
 	if (typeof patternCell != "string")
 		throw new ParseError(
 			"meetingPatterns: Expected string, got " + typeof patternCell
@@ -173,8 +177,12 @@ export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
 			if (typeof row[0] == "string" && endOfRowCells.indexOf(row[0]) !== -1)
 				break;
 
-			let section = await parseRow(dataColumns, row);
-			schedule.addSection(section);
+			try {
+				let section = await parseRow(dataColumns, row);
+				schedule.addSection(section);
+			} catch (error) {
+				console.error("Failed to parse row:", error);
+			}
 		}
 	}
 
@@ -201,7 +209,7 @@ async function parseRow(
 		courseFullName += ` with ${instructor}`;
 	}
 
-	const [days, startTime, endTime, location] = parseMeetingPattern(
+	const [days, startTime, endTime, location] = await parseMeetingPattern(
 		row[dataColumns[Columns.MEETING_PATTERNS]]
 	);
 
