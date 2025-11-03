@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "./Link.module.css";
 import { ExternalLink } from "feather-icons-react";
 
