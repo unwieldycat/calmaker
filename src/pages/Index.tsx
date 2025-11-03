@@ -76,7 +76,7 @@ export function IndexPage() {
 				<h1>WPI Calendar Generator</h1>
 
 				<p>
-					A quick tool to generate a Outlook, Apple Calendar, or Google Calendar
+					A quick tool to generate Outlook, Apple Calendar, or Google Calendar
 					events from your WPI Workday schedule.
 				</p>
 
