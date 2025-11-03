@@ -80,9 +80,8 @@ export function IndexPage() {
 					message={
 						<p>
 							A previous version of this tool had issues with daylight savings
-							where B-Term classes after daylight savings would be off by one
-							hour. Apologies for that. Make sure to cross-check your schedule
-							with Workday!
+							where B-Term classes after the switch would be off by one hour.
+							Check your schedule if you've used this before!
 						</p>
 					}
 				/>
