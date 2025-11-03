@@ -73,7 +73,12 @@ export function IndexPage() {
 	return (
 		<>
 			<main className={styles.main}>
-				<h1 className={styles.title}>WPI Calendar Generator</h1>
+				<h1>WPI Calendar Generator</h1>
+
+				<p>
+					A quick tool to generate a Outlook, Apple Calendar, or Google Calendar
+					events from your WPI Workday schedule.
+				</p>
 
 				<Toast
 					type="warning"
