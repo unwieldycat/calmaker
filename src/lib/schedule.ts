@@ -1,5 +1,10 @@
-import { CalendarOptions, ICalendar } from "datebook";
+import ical, {
+	ICalCalendarMethod,
+	ICalEventRepeatingFreq,
+	ICalWeekday,
+} from "ical-generator";
 import { DateTime } from "luxon";
+import { tzlib_get_ical_block } from "timezones-ical-library";
 
 export enum Weekdays {
 	Sunday = 7,
@@ -53,48 +58,46 @@ export class Schedule {
 	}
 
 	/**
-	 * Convert the schedule to an array of calendar options
-	 * @returns Array of calendar options
+	 * Convert the schedule to an ICalendar object
+	 * @returns An ICS-formatted string
 	 */
-	toCalendarOptions(): CalendarOptions[] {
-		const events: CalendarOptions[] = [];
+	toICalendar(): string {
+		const generatedCalendar = ical();
+
+		generatedCalendar.timezone({
+			name: "America/New_York",
+			generator: (tz) => tzlib_get_ical_block(tz)[0],
+		});
 
 		for (const section of this._sections) {
 			const weekdays = section.days.map(
-				(id) => ["MO", "TU", "WE", "TH", "FR", "SA", "SU"][id - 1]
+				(id) =>
+					[
+						ICalWeekday.MO,
+						ICalWeekday.TU,
+						ICalWeekday.WE,
+						ICalWeekday.TH,
+						ICalWeekday.FR,
+						ICalWeekday.SA,
+						ICalWeekday.SU,
+					][id - 1]
 			);
 
-			const event: CalendarOptions = {
-				title: section.name,
-				location: section.location,
+			generatedCalendar.createEvent({
+				summary: section.name,
 				description: section.description,
-				start: section.start.toJSDate(),
-				end: section.end.toJSDate(),
-				recurrence: {
-					frequency: "DAILY",
-					weekdays: weekdays,
-					end: section.lastDate.toJSDate(),
+				location: section.location,
+				timezone: "America/New_York",
+				start: section.start,
+				end: section.end,
+				repeating: {
+					freq: ICalEventRepeatingFreq.DAILY,
+					byDay: weekdays,
+					until: section.lastDate,
 				},
-			};
-
-			events.push(event);
+			});
 		}
 
-		return events;
-	}
-
-	/**
-	 * Convert the schedule to an ICalendar object
-	 * @returns An ICalendar object
-	 */
-	toICalendar(): ICalendar {
-		const options = this.toCalendarOptions();
-		const calendar = new ICalendar(options[0]);
-
-		for (const option of options.slice(1)) {
-			calendar.addEvent(new ICalendar(option));
-		}
-
-		return calendar;
+		return generatedCalendar.toString();
 	}
 }

@@ -64,7 +64,7 @@ export function IndexPage() {
 
 	const downloadFile = () => {
 		if (!schedule) return;
-		const data = schedule.toICalendar().render();
+		const data = schedule.toICalendar();
 		const blob = new Blob([data], { type: "text/calendar" });
 		const url = URL.createObjectURL(blob);
 		window.open(url);
@@ -73,8 +73,23 @@ export function IndexPage() {
 	return (
 		<>
 			<main className={styles.main}>
-				<h1 className={styles.title}>WPI Calendar Generator</h1>
+				<h1>WPI Calendar Generator</h1>
 
+				<p>
+					A quick tool to generate Outlook, Apple Calendar, or Google Calendar
+					events from your WPI Workday schedule.
+				</p>
+
+				<Toast
+					type="warning"
+					message={
+						<p>
+							A previous version of this tool had issues with daylight savings
+							where B-Term classes after the switch would be off by one hour.
+							Check your schedule if you've used this before!
+						</p>
+					}
+				/>
 				<Toast
 					type="warning"
 					message={
