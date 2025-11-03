@@ -220,6 +220,8 @@ async function parseRow(
 
 	let startDate = row[dataColumns[Columns.START_DATE]] as DateTime;
 	let lastDate = row[dataColumns[Columns.END_DATE]] as DateTime;
+	startDate.setZone("America/New_York");
+	lastDate.setZone("America/New_York");
 
 	// Make the cutoff 12AM the next day so no sections are excluded
 	lastDate = lastDate.plus({ days: 1 });
@@ -235,6 +237,8 @@ async function parseRow(
 		minute: endTime[1],
 		second: 0,
 	});
+
+	endDate.setZone("America/New_York");
 
 	// Adjust the start date/end date so that the event falls on the first
 	// session of the section

@@ -64,7 +64,7 @@ export function IndexPage() {
 
 	const downloadFile = () => {
 		if (!schedule) return;
-		const data = schedule.toICalendar().render();
+		const data = schedule.toICalendar();
 		const blob = new Blob([data], { type: "text/calendar" });
 		const url = URL.createObjectURL(blob);
 		window.open(url);
