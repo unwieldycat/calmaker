@@ -1,6 +1,12 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { parseSheet } from "../lib/parser";
-import { ArrowLeft, Check, Download, HelpCircle } from "feather-icons-react";
+import {
+	ArrowLeft,
+	ArrowRight,
+	Check,
+	Download,
+	HelpCircle,
+} from "feather-icons-react";
 import { Schedule } from "../lib/schedule";
 import { Toast } from "../components/Toast/Toast";
 import { sheetToArray } from "../lib/sheet";
@@ -9,6 +15,7 @@ import { FilePicker } from "../components/FilePicker/FilePicker";
 import styles from "./Index.module.css";
 import { Dialog } from "../components/Dialog/Dialog";
 import { Link } from "../components/Link/Link";
+import { Select } from "../components/Select/Select";
 
 enum DialogState {
 	ObtainingInfo,
@@ -21,14 +28,17 @@ export function IndexPage() {
 	const [schedule, setSchedule] = useState<Schedule | null>(null);
 	const [error, setError] = useState<Error | null>(null);
 	const [step, setStep] = useState<number>(1);
+	const [icsData, setIcsData] = useState<string>("");
 
 	useEffect(() => {
-		if (schedule) {
+		if (icsData.length > 0) {
+			setStep(3);
+		} else if (schedule) {
 			setStep(2);
 		} else {
 			setStep(1);
 		}
-	}, [schedule]);
+	}, [schedule, icsData]);
 
 	const closeDialog = () => {
 		setShowState(DialogState.None);
@@ -62,10 +72,14 @@ export function IndexPage() {
 		});
 	};
 
-	const downloadFile = () => {
+	const generateFile = () => {
 		if (!schedule) return;
 		const data = schedule.toICalendar();
-		const blob = new Blob([data], { type: "text/calendar" });
+		setIcsData(data);
+	};
+
+	const downloadFile = () => {
+		const blob = new Blob([icsData], { type: "text/calendar" });
 		const url = URL.createObjectURL(blob);
 		window.open(url);
 	};
@@ -80,26 +94,6 @@ export function IndexPage() {
 					events from your WPI Workday schedule.
 				</p>
 
-				<Toast
-					type="warning"
-					message={
-						<p>
-							A previous version of this tool had issues with daylight savings
-							where B-Term classes after the switch would be off by one hour.
-							Check your schedule if you've used this before!
-						</p>
-					}
-				/>
-				<Toast
-					type="warning"
-					message={
-						<p>
-							This tool doesn't currently account for modified schedule days.
-							You'll need to manually adjust your calendar afterward.
-						</p>
-					}
-				/>
-
 				{error && (
 					<Toast
 						type="error"
@@ -108,22 +102,67 @@ export function IndexPage() {
 				)}
 
 				{step == 1 && (
+					<>
+						<Toast
+							type="warning"
+							message={
+								<p>
+									A previous version of this tool had issues with daylight
+									savings where B-Term classes after the switch would be off by
+									one hour. Check your schedule if you've used this before!
+								</p>
+							}
+						/>
+
+						<div className={styles.step}>
+							<h2>Upload Time Table</h2>
+							<p>Upload your registered classes spreadsheet</p>
+							<div className={styles.btnCluster}>
+								<FilePicker accept=".xlsx" onChange={onFileChange} />
+								<Button
+									intent="secondary"
+									onClick={() => setShowState(DialogState.ObtainingInfo)}
+								>
+									<HelpCircle size={20} /> Help
+								</Button>
+							</div>
+						</div>
+					</>
+				)}
+
+				{step == 2 && (
 					<div className={styles.step}>
-						<h2>Step 1</h2>
-						<p>Upload your registered classes spreadsheet</p>
+						<h2>Review Options</h2>
+						<p>Select options for your calendar export.</p>
+
+						<Select defaultValue="25-26">
+							<option value="default">No modified days</option>
+							<option value="25-26">2025-2026 Schedule</option>
+							<option value="26-27">2026-2027 Schedule</option>
+						</Select>
+
 						<div className={styles.btnCluster}>
-							<FilePicker accept=".xlsx" onChange={onFileChange} />
 							<Button
 								intent="secondary"
-								onClick={() => setShowState(DialogState.ObtainingInfo)}
+								onClick={() => {
+									setSchedule(null);
+									setIcsData("");
+								}}
 							>
-								<HelpCircle size={20} /> Help
+								<ArrowLeft size={20} /> Back
+							</Button>
+							<Button
+								disabled={!schedule}
+								onClick={generateFile}
+								intent="primary"
+							>
+								<Check size={20} /> Generate
 							</Button>
 						</div>
 					</div>
 				)}
 
-				{step == 2 && (
+				{step == 3 && (
 					<>
 						<Toast
 							type="info"
@@ -138,7 +177,7 @@ export function IndexPage() {
 							}
 						/>
 						<div className={styles.step}>
-							<h2>Step 2</h2>
+							<h2>Export Calendar</h2>
 							<p>
 								Download the <code>.ics</code> file and import it into a new
 								calendar. Cross-check with your Workday schedule in case of
@@ -146,8 +185,13 @@ export function IndexPage() {
 							</p>
 
 							<div className={styles.btnCluster}>
-								<Button intent="secondary" onClick={() => setSchedule(null)}>
-									<ArrowLeft size={20} /> Done
+								<Button
+									intent="secondary"
+									onClick={() => {
+										setIcsData("");
+									}}
+								>
+									<ArrowLeft size={20} /> Back
 								</Button>
 								<Button
 									disabled={!schedule}
