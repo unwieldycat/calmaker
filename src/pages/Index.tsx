@@ -133,12 +133,12 @@ export function IndexPage() {
 				{step == 2 && (
 					<div className={styles.step}>
 						<h2>Review Options</h2>
-						<p>Select options for your calendar export.</p>
+						<p>Apply modified schedule days from</p>
 
 						<Select defaultValue="25-26">
-							<option value="default">No modified days</option>
-							<option value="25-26">2025-2026 Schedule</option>
-							<option value="26-27">2026-2027 Schedule</option>
+							<option value="default">Nothing. I'll do it myself</option>
+							<option value="25-26">2025-2026 Calendar</option>
+							<option value="26-27">2026-2027 Calendar</option>
 						</Select>
 
 						<div className={styles.btnCluster}>
