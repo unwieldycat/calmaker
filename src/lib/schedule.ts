@@ -134,8 +134,6 @@ export class Schedule {
 
 				overrideDates.push(override.date.startOf("day"));
 
-				console.log(overrideDates.toString());
-
 				if (override.schedule === "None") continue;
 
 				// Explanation for below:
