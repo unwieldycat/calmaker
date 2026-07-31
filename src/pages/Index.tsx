@@ -123,13 +123,6 @@ export function IndexPage() {
 					events from your WPI Workday schedule.
 				</p>
 
-				<Toast type="warning">
-					<p>
-						This tool doesn't currently account for modified schedule days.
-						You'll need to manually adjust your calendar afterward.
-					</p>
-				</Toast>
-
 				{errors.length > 0 && (
 					<Toast type="error">
 						{step === 1 ? (
