@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { findColumns, ParseError, parseTimeString } from "../lib/parser";
+import {
+	findColumns,
+	findHeaderRows,
+	parseSheet,
+	ParseError,
+	parseTimeString,
+} from "./parser";
+import { DateTime } from "luxon";
 
 describe("parser", () => {
 	describe("findColumns", async () => {
@@ -21,6 +28,37 @@ describe("parser", () => {
 			expect(() => findColumns(["A"], 2, sheetData)).toThrow(
 				"Invalid header row index",
 			);
+		});
+	});
+
+	describe("findHeaderRows", async () => {
+		it("should find one header row", () => {
+			const sheetData = [
+				["irrelevant"],
+				["My Enrolled Courses"],
+				["meta row"],
+				["Course Listing"],
+			];
+
+			expect(findHeaderRows(sheetData)).toEqual([3]);
+		});
+
+		it("should find multiple header rows", () => {
+			const sheetData = [
+				["My Enrolled Courses"],
+				["meta row"],
+				["Course Listing"],
+				["other data"],
+				["My Enrolled Courses"],
+				["meta row"],
+				["Course Listing"],
+			];
+
+			expect(findHeaderRows(sheetData)).toEqual([2, 6]);
+		});
+
+		it("should error if no header rows are found", () => {
+			expect(() => findHeaderRows([["A"], ["B"]])).toThrow(ParseError);
 		});
 	});
 
@@ -47,6 +85,96 @@ describe("parser", () => {
 
 		it("should error on invalid time", () => {
 			expect(() => parseTimeString("13:00 PM")).toThrow("Invalid time string");
+		});
+	});
+
+	describe("parseSheet", async () => {
+		it("should parse a section row and stop at end-of-row marker", async () => {
+			const sheetData = [
+				["My Enrolled Courses"],
+				["meta row"],
+				[
+					"Course Listing",
+					"Instructional Format",
+					"Meeting Patterns",
+					"Start Date",
+					"End Date",
+					"Instructor",
+				],
+				[
+					"CS 1110 - Intro to Programming",
+					"LEC",
+					"M-W-F | 1:00 PM - 1:50 PM | Rice Hall",
+					DateTime.fromISO("2026-01-12"),
+					DateTime.fromISO("2026-04-30"),
+					"Grace Hopper",
+				],
+				["My Completed Courses"],
+				[
+					"CS 2100 - Should Not Parse",
+					"LEC",
+					"T-R | 2:00 PM - 3:15 PM | Olsson Hall",
+					DateTime.fromISO("2026-01-13"),
+					DateTime.fromISO("2026-04-30"),
+					"Alan Turing",
+				],
+			];
+
+			const schedule = await parseSheet(sheetData);
+			expect(schedule.getSections()).toHaveLength(1);
+
+			const section = schedule.getSections()[0];
+
+			expect(section.name).toBe("CS 1110 LEC");
+			expect(section.description).toBe(
+				"Intro to Programming with Grace Hopper",
+			);
+
+			expect(section.location).toBe("Rice Hall");
+			expect(section.days).toEqual([1, 3, 5]);
+
+			expect(section.start.weekday).toBe(1);
+			expect(section.start.hour).toBe(13);
+			expect(section.start.minute).toBe(0);
+
+			expect(section.end.hour).toBe(13);
+			expect(section.end.minute).toBe(50);
+		});
+
+		it("should skip malformed rows and continue parsing", async () => {
+			const sheetData = [
+				["My Enrolled Courses"],
+				["meta row"],
+				[
+					"Course Listing",
+					"Instructional Format",
+					"Meeting Patterns",
+					"Start Date",
+					"End Date",
+					"Instructor",
+				],
+				[
+					1234,
+					"LEC",
+					"M-W | 9:00 AM - 10:15 AM | New Cabell",
+					DateTime.fromISO("2026-01-13"),
+					DateTime.fromISO("2026-04-30"),
+					"Invalid Row",
+				],
+				[
+					"STAT 2120 - Intro to Regression",
+					"LEC",
+					"T-R | 2:00 PM - 3:15 PM | New Cabell",
+					DateTime.fromISO("2026-01-13"),
+					DateTime.fromISO("2026-04-30"),
+					"Valid Instructor",
+				],
+			];
+
+			const schedule = await parseSheet(sheetData);
+			const sections = schedule.getSections();
+			expect(sections).toHaveLength(1);
+			expect(sections[0].name).toBe("STAT 2120 LEC");
 		});
 	});
 });
