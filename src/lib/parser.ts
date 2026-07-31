@@ -62,7 +62,7 @@ export function findHeaderRows(sheetData: CellValue[][]): number[] {
 export function findColumns(
 	headerNames: string[],
 	headerRow: number,
-	sheetData: CellValue[][]
+	sheetData: CellValue[][],
 ): Record<string, number> {
 	const columns: Record<string, number> = {};
 	if (sheetData.length <= headerRow)
@@ -109,7 +109,7 @@ export function parseTimeString(time: string): [number, number] {
 function parseCourseName(courseNameCell: CellValue) {
 	if (typeof courseNameCell != "string")
 		throw new ParseError(
-			"courseName: Expected string, got " + typeof courseNameCell
+			"courseName: Expected string, got " + typeof courseNameCell,
 		);
 
 	const splitted = courseNameCell.split("-");
@@ -124,9 +124,12 @@ function parseCourseName(courseNameCell: CellValue) {
  * @returns Days, startTime, endTime, and location
  */
 async function parseMeetingPattern(patternCell: CellValue) {
+	// Some courses like IQP don't have a meeting pattern, so we return null in that case
+	if (!patternCell) return null;
+
 	if (typeof patternCell != "string")
 		throw new ParseError(
-			"meetingPatterns: Expected string, got " + typeof patternCell
+			"meetingPatterns: Expected string, got " + typeof patternCell,
 		);
 
 	const splitted = patternCell.split("|");
@@ -151,10 +154,13 @@ async function parseMeetingPattern(patternCell: CellValue) {
  * @param sheet XLSX Worksheet to parse
  * @returns A schedule object
  */
-export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
+export async function parseSheet(
+	sheetData: CellValue[][],
+): Promise<[Schedule, Error[]]> {
 	const headerRows = findHeaderRows(sheetData);
 
 	const schedule = new Schedule();
+	const errors: Error[] = [];
 
 	for (const headerRow of headerRows) {
 		const dataColumns = findColumns(
@@ -167,7 +173,7 @@ export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
 				Columns.INSTRUCTOR,
 			],
 			headerRow,
-			sheetData
+			sheetData,
 		);
 
 		for (let r = headerRow + 1; r < sheetData.length; r++) {
@@ -181,12 +187,18 @@ export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
 				let section = await parseRow(dataColumns, row);
 				schedule.addSection(section);
 			} catch (error) {
-				console.error("Failed to parse row:", error);
+				console.error(`Failed to parse row ${r}:`, error);
+
+				if (error instanceof Error) {
+					errors.push(error);
+				} else {
+					errors.push(new Error(`Unknown error occurred: ${error}`));
+				}
 			}
 		}
 	}
 
-	return schedule;
+	return [schedule, errors];
 }
 
 /**
@@ -197,10 +209,10 @@ export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
  */
 async function parseRow(
 	dataColumns: Record<string, number>,
-	row: CellValue[]
+	row: CellValue[],
 ): Promise<Section> {
 	let [courseId, courseFullName] = parseCourseName(
-		row[dataColumns[Columns.COURSE_LISTING]]
+		row[dataColumns[Columns.COURSE_LISTING]],
 	);
 
 	const courseFormat = row[dataColumns[Columns.INSTRUCTIONAL_FORMAT]];
@@ -209,8 +221,8 @@ async function parseRow(
 		courseFullName += ` with ${instructor}`;
 	}
 
-	const [days, startTime, endTime, location] = await parseMeetingPattern(
-		row[dataColumns[Columns.MEETING_PATTERNS]]
+	const meetingPatternResult = await parseMeetingPattern(
+		row[dataColumns[Columns.MEETING_PATTERNS]],
 	);
 
 	if (!(row[dataColumns[Columns.START_DATE]] instanceof DateTime))
@@ -226,40 +238,54 @@ async function parseRow(
 	// Make the cutoff 12AM the next day so no sections are excluded
 	lastDate = lastDate.plus({ days: 1 });
 
-	startDate = startDate.set({
-		hour: startTime[0],
-		minute: startTime[1],
-		second: 0,
-	});
+	// Treat as an all day event
+	if (!meetingPatternResult) {
+		return {
+			name: `${courseId} ${courseFormat}`,
+			description: courseFullName,
+			allDay: true,
+			start: startDate,
+			lastDate: lastDate,
+		};
+	} else {
+		const [days, startTime, endTime, location] = meetingPatternResult;
 
-	let endDate = startDate.set({
-		hour: endTime[0],
-		minute: endTime[1],
-		second: 0,
-	});
+		startDate = startDate.set({
+			hour: startTime[0],
+			minute: startTime[1],
+			second: 0,
+		});
 
-	endDate.setZone("America/New_York");
+		let endDate = startDate.set({
+			hour: endTime[0],
+			minute: endTime[1],
+			second: 0,
+		});
 
-	// Adjust the start date/end date so that the event falls on the first
-	// session of the section
-	const diffs = days.map((weekday) => {
-		const diff = (weekday - startDate.weekday + 7) % 7;
-		return diff;
-	});
-	const minDiff = Math.min(...diffs);
+		endDate.setZone("America/New_York");
 
-	if (minDiff !== 0) {
-		startDate = startDate.plus({ days: minDiff });
-		endDate = endDate.plus({ days: minDiff });
+		// Adjust the start date/end date so that the event falls on the first
+		// session of the section
+		const diffs = days.map((weekday) => {
+			const diff = (weekday - startDate.weekday + 7) % 7;
+			return diff;
+		});
+		const minDiff = Math.min(...diffs);
+
+		if (minDiff !== 0) {
+			startDate = startDate.plus({ days: minDiff });
+			endDate = endDate.plus({ days: minDiff });
+		}
+
+		return {
+			name: `${courseId} ${courseFormat}`,
+			description: courseFullName,
+			location,
+			allDay: false,
+			days,
+			start: startDate,
+			end: endDate,
+			lastDate: lastDate,
+		};
 	}
-
-	return {
-		name: `${courseId} ${courseFormat}`,
-		description: courseFullName,
-		location,
-		days,
-		start: startDate,
-		end: endDate,
-		lastDate: lastDate,
-	};
 }

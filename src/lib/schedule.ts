@@ -21,19 +21,22 @@ export interface Section {
 	name: string;
 
 	/** Location of the section */
-	location: string;
+	location?: string;
 
 	/** Description of the section */
 	description: string;
 
 	/** Days to repeat on */
-	days: Weekdays[];
+	days?: Weekdays[];
 
 	/** Start of first section */
 	start: DateTime;
 
 	/** End of first section */
-	end: DateTime;
+	end?: DateTime;
+
+	/** Whether the event is an all day event. If true ignore end date, days, etc. */
+	allDay: boolean;
 
 	/** Last date of the event */
 	lastDate: DateTime;
@@ -47,6 +50,14 @@ export class Schedule {
 	 */
 	constructor() {
 		this._sections = [];
+	}
+
+	/**
+	 * Get the sections in the schedule
+	 * @returns An array of sections
+	 */
+	getSections(): Section[] {
+		return this._sections;
 	}
 
 	/**
@@ -70,32 +81,53 @@ export class Schedule {
 		});
 
 		for (const section of this._sections) {
-			const weekdays = section.days.map(
-				(id) =>
-					[
-						ICalWeekday.MO,
-						ICalWeekday.TU,
-						ICalWeekday.WE,
-						ICalWeekday.TH,
-						ICalWeekday.FR,
-						ICalWeekday.SA,
-						ICalWeekday.SU,
-					][id - 1]
-			);
+			if (!section.allDay) {
+				if (!section.end || !section.days) {
+					throw new Error(
+						"Invalid section: missing end date or days for a non all-day event",
+					);
+				}
 
-			generatedCalendar.createEvent({
-				summary: section.name,
-				description: section.description,
-				location: section.location,
-				timezone: "America/New_York",
-				start: section.start,
-				end: section.end,
-				repeating: {
-					freq: ICalEventRepeatingFreq.DAILY,
-					byDay: weekdays,
-					until: section.lastDate,
-				},
-			});
+				const weekdays = section.days.map(
+					(id) =>
+						[
+							ICalWeekday.MO,
+							ICalWeekday.TU,
+							ICalWeekday.WE,
+							ICalWeekday.TH,
+							ICalWeekday.FR,
+							ICalWeekday.SA,
+							ICalWeekday.SU,
+						][id - 1],
+				);
+
+				generatedCalendar.createEvent({
+					summary: section.name,
+					description: section.description,
+					location: section.location,
+					timezone: "America/New_York",
+					start: section.start,
+					end: section.end,
+					repeating: {
+						freq: ICalEventRepeatingFreq.DAILY,
+						byDay: weekdays,
+						until: section.lastDate,
+					},
+				});
+			} else {
+				generatedCalendar.createEvent({
+					summary: section.name,
+					description: section.description,
+					location: section.location,
+					timezone: "America/New_York",
+					start: section.start,
+					allDay: true,
+					repeating: {
+						freq: ICalEventRepeatingFreq.DAILY,
+						until: section.lastDate,
+					},
+				});
+			}
 		}
 
 		return generatedCalendar.toString();

@@ -16,7 +16,7 @@ const toastVariants = cva(styles.toast, {
 	},
 });
 
-export function Toast({ type, message }: ToastProps) {
+export function Toast({ type, children }: ToastProps) {
 	return (
 		<div className={toastVariants({ type })}>
 			<div className={styles.header}>
@@ -37,12 +37,11 @@ export function Toast({ type, message }: ToastProps) {
 				)}
 			</div>
 
-			{message}
+			{children && <div className={styles.body}>{children}</div>}
 		</div>
 	);
 }
 
-export interface ToastProps {
+export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
 	type: "error" | "info" | "warning";
-	message: ReactNode;
 }
