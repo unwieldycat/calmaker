@@ -7,6 +7,7 @@ import {
 	parseTimeString,
 } from "./parser";
 import { DateTime } from "luxon";
+import { Schedule } from "./schedule";
 
 describe("parser", () => {
 	describe("findColumns", async () => {
@@ -120,10 +121,15 @@ describe("parser", () => {
 				],
 			];
 
-			const schedule = await parseSheet(sheetData);
-			expect(schedule.getSections()).toHaveLength(1);
+			const parsed = await parseSheet(sheetData);
 
-			const section = schedule.getSections()[0];
+			expect(parsed[1]).toEqual([]);
+
+			const sections = parsed[0].getSections();
+
+			expect(sections).toHaveLength(1);
+
+			const section = sections[0];
 
 			expect(section.name).toBe("CS 1110 LEC");
 			expect(section.description).toBe(
@@ -171,10 +177,16 @@ describe("parser", () => {
 				],
 			];
 
-			const schedule = await parseSheet(sheetData);
-			const sections = schedule.getSections();
-			expect(sections).toHaveLength(1);
-			expect(sections[0].name).toBe("STAT 2120 LEC");
+			const result = await parseSheet(sheetData);
+
+			expect(result).toEqual([
+				expect.any(Schedule),
+				expect.arrayContaining([
+					new ParseError("courseName: Expected string, got number"),
+				]),
+			]);
+
+			expect(result[0].getSections()).toHaveLength(1);
 		});
 	});
 });
