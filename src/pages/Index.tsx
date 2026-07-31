@@ -84,16 +84,6 @@ export function IndexPage() {
 					type="warning"
 					message={
 						<p>
-							A previous version of this tool had issues with daylight savings
-							where B-Term classes after the switch would be off by one hour.
-							Check your schedule if you've used this before!
-						</p>
-					}
-				/>
-				<Toast
-					type="warning"
-					message={
-						<p>
 							This tool doesn't currently account for modified schedule days.
 							You'll need to manually adjust your calendar afterward.
 						</p>
