@@ -16,6 +16,9 @@ import styles from "./Index.module.css";
 import { Dialog } from "../components/Dialog/Dialog";
 import { Link } from "../components/Link/Link";
 import { Select } from "../components/Select/Select";
+import { DateTime } from "luxon";
+import scheduleOverrides from "../schedules.json";
+import type { ScheduleOverride } from "../lib/schedule";
 
 enum DialogState {
 	ObtainingInfo,
@@ -29,6 +32,8 @@ export function IndexPage() {
 	const [errors, setErrors] = useState<Error[]>([]);
 	const [step, setStep] = useState<number>(1);
 	const [icsData, setIcsData] = useState<string>("");
+	const [selectedOverrideSet, setSelectedOverrideSet] =
+		useState<string>("default");
 
 	useEffect(() => {
 		if (icsData.length > 0) {
@@ -73,9 +78,32 @@ export function IndexPage() {
 		});
 	};
 
+	const loadOverrides = () => {
+		const overrideSet = scheduleOverrides.find(
+			(set) => set.name === selectedOverrideSet,
+		);
+
+		if (!overrideSet) return [];
+
+		const overrides: ScheduleOverride[] = overrideSet.overrides.map(
+			(override) => ({
+				date: DateTime.fromFormat(override.date, "MM-dd-yyyy", {
+					zone: "America/New_York",
+				}),
+				schedule: override.schedule,
+				name: override.name,
+			}),
+		);
+
+		return overrides;
+	};
+
 	const generateFile = () => {
 		if (!schedule) return;
-		const data = schedule.toICalendar();
+
+		const overrides = loadOverrides();
+
+		const data = schedule.toICalendar(overrides);
 		setIcsData(data);
 	};
 
@@ -130,17 +158,6 @@ export function IndexPage() {
 
 				{step == 1 && (
 					<>
-						<Toast
-							type="warning"
-							message={
-								<p>
-									A previous version of this tool had issues with daylight
-									savings where B-Term classes after the switch would be off by
-									one hour. Check your schedule if you've used this before!
-								</p>
-							}
-						/>
-
 						<div className={styles.step}>
 							<h2>Upload Time Table</h2>
 							<p>Upload your registered classes spreadsheet</p>
@@ -162,10 +179,12 @@ export function IndexPage() {
 						<h2>Review Options</h2>
 						<p>Apply modified schedule days from</p>
 
-						<Select defaultValue="25-26">
+						<Select
+							value={selectedOverrideSet}
+							onChange={(event) => setSelectedOverrideSet(event.target.value)}
+						>
+							<option value="2026-2027 Calendar">2026-2027 Calendar</option>
 							<option value="default">Nothing. I'll do it myself</option>
-							<option value="25-26">2025-2026 Calendar</option>
-							<option value="26-27">2026-2027 Calendar</option>
 						</Select>
 
 						<div className={styles.btnCluster}>
