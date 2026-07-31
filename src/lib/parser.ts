@@ -62,7 +62,7 @@ export function findHeaderRows(sheetData: CellValue[][]): number[] {
 export function findColumns(
 	headerNames: string[],
 	headerRow: number,
-	sheetData: CellValue[][]
+	sheetData: CellValue[][],
 ): Record<string, number> {
 	const columns: Record<string, number> = {};
 	if (sheetData.length <= headerRow)
@@ -109,7 +109,7 @@ export function parseTimeString(time: string): [number, number] {
 function parseCourseName(courseNameCell: CellValue) {
 	if (typeof courseNameCell != "string")
 		throw new ParseError(
-			"courseName: Expected string, got " + typeof courseNameCell
+			"courseName: Expected string, got " + typeof courseNameCell,
 		);
 
 	const splitted = courseNameCell.split("-");
@@ -126,7 +126,7 @@ function parseCourseName(courseNameCell: CellValue) {
 async function parseMeetingPattern(patternCell: CellValue) {
 	if (typeof patternCell != "string")
 		throw new ParseError(
-			"meetingPatterns: Expected string, got " + typeof patternCell
+			"meetingPatterns: Expected string, got " + typeof patternCell,
 		);
 
 	const splitted = patternCell.split("|");
@@ -151,10 +151,13 @@ async function parseMeetingPattern(patternCell: CellValue) {
  * @param sheet XLSX Worksheet to parse
  * @returns A schedule object
  */
-export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
+export async function parseSheet(
+	sheetData: CellValue[][],
+): Promise<[Schedule, Error[]]> {
 	const headerRows = findHeaderRows(sheetData);
 
 	const schedule = new Schedule();
+	const errors: Error[] = [];
 
 	for (const headerRow of headerRows) {
 		const dataColumns = findColumns(
@@ -167,7 +170,7 @@ export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
 				Columns.INSTRUCTOR,
 			],
 			headerRow,
-			sheetData
+			sheetData,
 		);
 
 		for (let r = headerRow + 1; r < sheetData.length; r++) {
@@ -181,12 +184,18 @@ export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
 				let section = await parseRow(dataColumns, row);
 				schedule.addSection(section);
 			} catch (error) {
-				console.error("Failed to parse row:", error);
+				console.error(`Failed to parse row ${r}:`, error);
+
+				if (error instanceof Error) {
+					errors.push(error);
+				} else {
+					errors.push(new Error(`Unknown error occurred: ${error}`));
+				}
 			}
 		}
 	}
 
-	return schedule;
+	return [schedule, errors];
 }
 
 /**
@@ -197,10 +206,10 @@ export async function parseSheet(sheetData: CellValue[][]): Promise<Schedule> {
  */
 async function parseRow(
 	dataColumns: Record<string, number>,
-	row: CellValue[]
+	row: CellValue[],
 ): Promise<Section> {
 	let [courseId, courseFullName] = parseCourseName(
-		row[dataColumns[Columns.COURSE_LISTING]]
+		row[dataColumns[Columns.COURSE_LISTING]],
 	);
 
 	const courseFormat = row[dataColumns[Columns.INSTRUCTIONAL_FORMAT]];
@@ -210,7 +219,7 @@ async function parseRow(
 	}
 
 	const [days, startTime, endTime, location] = await parseMeetingPattern(
-		row[dataColumns[Columns.MEETING_PATTERNS]]
+		row[dataColumns[Columns.MEETING_PATTERNS]],
 	);
 
 	if (!(row[dataColumns[Columns.START_DATE]] instanceof DateTime))
