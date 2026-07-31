@@ -1,14 +1,50 @@
 [
 	{
-		"name": "2025-2026 Calendar",
-		"wellnessDays": ["09-19-2025", "11-4-2025", "02-13-2026", "03-30-2026"],
-		"academicDays": ["12-08-2025", "02-26-2026", "04-24-2026"],
-		"alternateDays": {
-			"09-04-2025": "M",
-			"01-14-2026": "M",
-			"03-31-2026": "M",
-			"05-06-2026": "F",
-			"05-28-2026": "M"
-		}
+		"name": "2026-2027 Calendar",
+		"overrides": [
+			{ "date": "09-07-2026", "schedule": "None" },
+			{
+				"date": "09-10-2026",
+				"name": "Monday Schedule",
+				"schedule": "M"
+			},
+			{
+				"date": "09-25-2026",
+				"name": "Wellness Day",
+				"schedule": "None"
+			},
+			{
+				"date": "11-03-2026",
+				"name": "Wellness Day",
+				"schedule": "None"
+			},
+			{ "date": "11-25-2026", "schedule": "None" },
+			{ "date": "11-26-2026", "schedule": "None" },
+			{ "date": "11-27-2026", "schedule": "None" },
+			{
+				"date": "12-07-2026",
+				"name": "Reading/Make-up day"
+			},
+			{ "date": "01-13-2027", "name": "Monday Schedule", "schedule": "M" },
+			{ "date": "01-18-2027", "schedule": "None" },
+			{ "date": "02-12-2027", "name": "Wellness Day", "schedule": "None" },
+			{
+				"date": "02-25-2027",
+				"name": "Academic Advising Day",
+				"schedule": "None"
+			},
+			{ "date": "03-29-2027", "name": "Wellness Day", "schedule": "None" },
+			{ "date": "03-30-2027", "name": "Monday Schedule", "schedule": "M" },
+			{
+				"date": "04-16-2027",
+				"name": "Undergraduate Research Projects Showcase",
+				"schedule": "None"
+			},
+			{ "date": "04-19-2027", "schedule": "None" },
+			{ "date": "05-05-2027", "name": "Friday Schedule", "schedule": "F" },
+			{ "date": "05-31-2027", "schedule": "None" },
+			{ "date": "06-03-2027", "schedule": "M" },
+			{ "date": "06-18-2027", "schedule": "None" }
+		]
 	}
 ]
