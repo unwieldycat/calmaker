@@ -19,7 +19,7 @@ enum DialogState {
 export function IndexPage() {
 	const [showState, setShowState] = useState<DialogState>(DialogState.None);
 	const [schedule, setSchedule] = useState<Schedule | null>(null);
-	const [error, setError] = useState<Error | null>(null);
+	const [errors, setErrors] = useState<Error[]>([]);
 	const [step, setStep] = useState<number>(1);
 
 	useEffect(() => {
@@ -27,6 +27,7 @@ export function IndexPage() {
 			setStep(2);
 		} else {
 			setStep(1);
+			setErrors([]);
 		}
 	}, [schedule]);
 
@@ -49,15 +50,15 @@ export function IndexPage() {
 			const sheetData = sheetToArray(sheet);
 
 			parseSheet(sheetData)
-				.then((schedule) => {
-					if (error) setError(null);
-					setSchedule(schedule);
+				.then((parsedResult) => {
+					setErrors(parsedResult[1]);
+					setSchedule(parsedResult[0]);
 				})
 				.catch((e) => {
 					console.error(e);
 					console.error("Erroneous sheet data below:", sheetData);
 					setSchedule(null);
-					setError(e);
+					setErrors([e]);
 				});
 		});
 	};
@@ -80,31 +81,37 @@ export function IndexPage() {
 					events from your WPI Workday schedule.
 				</p>
 
-				<Toast
-					type="warning"
-					message={
-						<p>
-							A previous version of this tool had issues with daylight savings
-							where B-Term classes after the switch would be off by one hour.
-							Check your schedule if you've used this before!
-						</p>
-					}
-				/>
-				<Toast
-					type="warning"
-					message={
-						<p>
-							This tool doesn't currently account for modified schedule days.
-							You'll need to manually adjust your calendar afterward.
-						</p>
-					}
-				/>
+				<Toast type="warning">
+					<p>
+						This tool doesn't currently account for modified schedule days.
+						You'll need to manually adjust your calendar afterward.
+					</p>
+				</Toast>
 
-				{error && (
-					<Toast
-						type="error"
-						message={<p>Failed to parse file. It could be the wrong one.</p>}
-					/>
+				{errors.length > 0 && (
+					<Toast type="error">
+						{step === 1 ? (
+							<p>
+								The following errors occurred while parsing your sheet. Ensure
+								that your sheet is a valid Workday registration export and that
+								it hasn't been modified.
+							</p>
+						) : (
+							<p>
+								The following errors occurred while parsing your sheet. Verify
+								the output against your Workday schedule to ensure that it is
+								correct.
+							</p>
+						)}
+
+						<div className={styles.errorList}>
+							{errors.map((error) => (
+								<p key={error.name + error.message}>
+									<b>{error.name}</b>: {error.message}
+								</p>
+							))}
+						</div>
+					</Toast>
 				)}
 
 				{step == 1 && (
@@ -125,18 +132,15 @@ export function IndexPage() {
 
 				{step == 2 && (
 					<>
-						<Toast
-							type="info"
-							message={
-								<p>
-									Bad output?{" "}
-									<a href="https://github.com/unwieldycat/calmaker/issues">
-										Create a GitHub issue
-									</a>{" "}
-									or contact me!
-								</p>
-							}
-						/>
+						<Toast type="info">
+							<p>
+								Bad output?{" "}
+								<a href="https://github.com/unwieldycat/calmaker/issues">
+									Create a GitHub issue
+								</a>{" "}
+								or contact me!
+							</p>
+						</Toast>
 						<div className={styles.step}>
 							<h2>Step 2</h2>
 							<p>
