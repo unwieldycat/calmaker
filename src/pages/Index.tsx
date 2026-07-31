@@ -19,7 +19,7 @@ enum DialogState {
 export function IndexPage() {
 	const [showState, setShowState] = useState<DialogState>(DialogState.None);
 	const [schedule, setSchedule] = useState<Schedule | null>(null);
-	const [error, setError] = useState<Error | null>(null);
+	const [errors, setErrors] = useState<Error[]>([]);
 	const [step, setStep] = useState<number>(1);
 
 	useEffect(() => {
@@ -49,15 +49,15 @@ export function IndexPage() {
 			const sheetData = sheetToArray(sheet);
 
 			parseSheet(sheetData)
-				.then((schedule) => {
-					if (error) setError(null);
-					setSchedule(schedule);
+				.then((parsedResult) => {
+					setErrors(parsedResult[1]);
+					setSchedule(parsedResult[0]);
 				})
 				.catch((e) => {
 					console.error(e);
 					console.error("Erroneous sheet data below:", sheetData);
 					setSchedule(null);
-					setError(e);
+					setErrors([e]);
 				});
 		});
 	};
@@ -90,12 +90,16 @@ export function IndexPage() {
 					}
 				/>
 
-				{error && (
+				{errors.map((error) => (
 					<Toast
 						type="error"
-						message={<p>Failed to parse file. It could be the wrong one.</p>}
+						message={
+							<p>
+								{error.name}: {error.message}
+							</p>
+						}
 					/>
-				)}
+				))}
 
 				{step == 1 && (
 					<div className={styles.step}>
