@@ -49,6 +49,10 @@ export class Schedule {
 		this._sections = [];
 	}
 
+	/**
+	 * Get the sections in the schedule
+	 * @returns An array of sections
+	 */
 	getSections(): Section[] {
 		return this._sections;
 	}
