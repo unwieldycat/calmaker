@@ -124,6 +124,9 @@ function parseCourseName(courseNameCell: CellValue) {
  * @returns Days, startTime, endTime, and location
  */
 async function parseMeetingPattern(patternCell: CellValue) {
+	// Some courses like IQP don't have a meeting pattern, so we return null in that case
+	if (!patternCell) return null;
+
 	if (typeof patternCell != "string")
 		throw new ParseError(
 			"meetingPatterns: Expected string, got " + typeof patternCell,
@@ -218,7 +221,7 @@ async function parseRow(
 		courseFullName += ` with ${instructor}`;
 	}
 
-	const [days, startTime, endTime, location] = await parseMeetingPattern(
+	const meetingPatternResult = await parseMeetingPattern(
 		row[dataColumns[Columns.MEETING_PATTERNS]],
 	);
 
@@ -235,40 +238,54 @@ async function parseRow(
 	// Make the cutoff 12AM the next day so no sections are excluded
 	lastDate = lastDate.plus({ days: 1 });
 
-	startDate = startDate.set({
-		hour: startTime[0],
-		minute: startTime[1],
-		second: 0,
-	});
+	// Treat as an all day event
+	if (!meetingPatternResult) {
+		return {
+			name: `${courseId} ${courseFormat}`,
+			description: courseFullName,
+			allDay: true,
+			start: startDate,
+			lastDate: lastDate,
+		};
+	} else {
+		const [days, startTime, endTime, location] = meetingPatternResult;
 
-	let endDate = startDate.set({
-		hour: endTime[0],
-		minute: endTime[1],
-		second: 0,
-	});
+		startDate = startDate.set({
+			hour: startTime[0],
+			minute: startTime[1],
+			second: 0,
+		});
 
-	endDate.setZone("America/New_York");
+		let endDate = startDate.set({
+			hour: endTime[0],
+			minute: endTime[1],
+			second: 0,
+		});
 
-	// Adjust the start date/end date so that the event falls on the first
-	// session of the section
-	const diffs = days.map((weekday) => {
-		const diff = (weekday - startDate.weekday + 7) % 7;
-		return diff;
-	});
-	const minDiff = Math.min(...diffs);
+		endDate.setZone("America/New_York");
 
-	if (minDiff !== 0) {
-		startDate = startDate.plus({ days: minDiff });
-		endDate = endDate.plus({ days: minDiff });
+		// Adjust the start date/end date so that the event falls on the first
+		// session of the section
+		const diffs = days.map((weekday) => {
+			const diff = (weekday - startDate.weekday + 7) % 7;
+			return diff;
+		});
+		const minDiff = Math.min(...diffs);
+
+		if (minDiff !== 0) {
+			startDate = startDate.plus({ days: minDiff });
+			endDate = endDate.plus({ days: minDiff });
+		}
+
+		return {
+			name: `${courseId} ${courseFormat}`,
+			description: courseFullName,
+			location,
+			allDay: false,
+			days,
+			start: startDate,
+			end: endDate,
+			lastDate: lastDate,
+		};
 	}
-
-	return {
-		name: `${courseId} ${courseFormat}`,
-		description: courseFullName,
-		location,
-		days,
-		start: startDate,
-		end: endDate,
-		lastDate: lastDate,
-	};
 }

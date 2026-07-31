@@ -143,8 +143,8 @@ describe("parser", () => {
 			expect(section.start.hour).toBe(13);
 			expect(section.start.minute).toBe(0);
 
-			expect(section.end.hour).toBe(13);
-			expect(section.end.minute).toBe(50);
+			expect(section.end?.hour).toBe(13);
+			expect(section.end?.minute).toBe(50);
 		});
 
 		it("should skip malformed rows and continue parsing", async () => {
@@ -187,6 +187,39 @@ describe("parser", () => {
 			]);
 
 			expect(result[0].getSections()).toHaveLength(1);
+		});
+
+		it("should handle sections with no meeting patterns", async () => {
+			const sheetData = [
+				["My Enrolled Courses"],
+				["meta row"],
+				[
+					"Course Listing",
+					"Instructional Format",
+					"Meeting Patterns",
+					"Start Date",
+					"End Date",
+					"Instructor",
+				],
+				[
+					"PC 1000 - Project Center",
+					"LEC",
+					null,
+					DateTime.fromISO("2026-01-12"),
+					DateTime.fromISO("2026-05-06"),
+					"John Doe",
+				],
+			];
+
+			const result = await parseSheet(sheetData);
+
+			expect(result[1]).toEqual([]);
+
+			const sections = result[0].getSections();
+
+			expect(sections).toHaveLength(1);
+			expect(sections[0].name).toBe("PC 1000 LEC");
+			expect(sections[0].allDay).toBe(true);
 		});
 	});
 });
