@@ -27,6 +27,7 @@ export function IndexPage() {
 			setStep(2);
 		} else {
 			setStep(1);
+			setErrors([]);
 		}
 	}, [schedule]);
 
@@ -80,26 +81,38 @@ export function IndexPage() {
 					events from your WPI Workday schedule.
 				</p>
 
-				<Toast
-					type="warning"
-					message={
-						<p>
-							This tool doesn't currently account for modified schedule days.
-							You'll need to manually adjust your calendar afterward.
-						</p>
-					}
-				/>
+				<Toast type="warning">
+					<p>
+						This tool doesn't currently account for modified schedule days.
+						You'll need to manually adjust your calendar afterward.
+					</p>
+				</Toast>
 
-				{errors.map((error) => (
-					<Toast
-						type="error"
-						message={
+				{errors.length > 0 && (
+					<Toast type="error">
+						{step === 1 ? (
 							<p>
-								{error.name}: {error.message}
+								The following errors occurred while parsing your sheet. Ensure
+								that your sheet is a valid Workday registration export and that
+								it hasn't been modified.
 							</p>
-						}
-					/>
-				))}
+						) : (
+							<p>
+								The following errors occurred while parsing your sheet. Verify
+								the output against your Workday schedule to ensure that it is
+								correct.
+							</p>
+						)}
+
+						<div className={styles.errorList}>
+							{errors.map((error) => (
+								<p key={error.name + error.message}>
+									<b>{error.name}</b>: {error.message}
+								</p>
+							))}
+						</div>
+					</Toast>
+				)}
 
 				{step == 1 && (
 					<div className={styles.step}>
@@ -119,18 +132,15 @@ export function IndexPage() {
 
 				{step == 2 && (
 					<>
-						<Toast
-							type="info"
-							message={
-								<p>
-									Bad output?{" "}
-									<a href="https://github.com/unwieldycat/calmaker/issues">
-										Create a GitHub issue
-									</a>{" "}
-									or contact me!
-								</p>
-							}
-						/>
+						<Toast type="info">
+							<p>
+								Bad output?{" "}
+								<a href="https://github.com/unwieldycat/calmaker/issues">
+									Create a GitHub issue
+								</a>{" "}
+								or contact me!
+							</p>
+						</Toast>
 						<div className={styles.step}>
 							<h2>Step 2</h2>
 							<p>
