@@ -49,6 +49,10 @@ export class Schedule {
 		this._sections = [];
 	}
 
+	getSections(): Section[] {
+		return this._sections;
+	}
+
 	/**
 	 * Add a new section to the schedule
 	 * @param section Section to add to the schedule
@@ -80,7 +84,7 @@ export class Schedule {
 						ICalWeekday.FR,
 						ICalWeekday.SA,
 						ICalWeekday.SU,
-					][id - 1]
+					][id - 1],
 			);
 
 			generatedCalendar.createEvent({
