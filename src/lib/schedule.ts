@@ -133,13 +133,26 @@ export class Schedule {
 					continue;
 				}
 
-				overrideDates.push(
-					section.start.set({
-						day: override.date.day,
-						month: override.date.month,
+				const overrideDate = DateTime.fromObject(
+					{
 						year: override.date.year,
-					}),
+						month: override.date.month,
+						day: override.date.day,
+						hour: section.start.hour,
+						minute: section.start.minute,
+						second: section.start.second,
+						millisecond: section.start.millisecond,
+					},
+					{ zone: section.start.zone },
 				);
+
+				// EXDATE must match an actual generated occurrence. If the override day
+				// doesn't align with this section's recurrence weekdays, excluding this
+				// timestamp has no effect and can fail to suppress the intended class.
+				if (section.days && !section.days.includes(overrideDate.weekday as Weekdays))
+					continue;
+
+				overrideDates.push(overrideDate);
 
 				if (override.schedule === undefined) continue;
 				if (override.schedule === "None") continue;
@@ -176,17 +189,33 @@ export class Schedule {
 				// If the override's requested weekday is not in the section's weekday, no event should be made.
 				if (!section.days.includes(sourceWeekday)) continue;
 
-				const alternateStart = section.start.set({
-					day: override.date.day,
-					month: override.date.month,
-					year: override.date.year,
-				});
+				const alternateStart = DateTime.fromObject(
+					{
+						year: override.date.year,
+						month: override.date.month,
+						day: override.date.day,
+						hour: section.start.hour,
+						minute: section.start.minute,
+						second: section.start.second,
+						millisecond: section.start.millisecond,
+					},
+					{ zone: section.start.zone },
+				);
 
-				const alternateEnd = section.end?.set({
-					day: override.date.day,
-					month: override.date.month,
-					year: override.date.year,
-				});
+				const alternateEnd = section.end
+					? DateTime.fromObject(
+							{
+								year: override.date.year,
+								month: override.date.month,
+								day: override.date.day,
+								hour: section.end.hour,
+								minute: section.end.minute,
+								second: section.end.second,
+								millisecond: section.end.millisecond,
+							},
+							{ zone: section.end.zone },
+						)
+					: undefined;
 
 				generatedCalendar.createEvent({
 					summary: section.name,
