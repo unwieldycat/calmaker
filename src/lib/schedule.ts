@@ -120,11 +120,12 @@ export class Schedule {
 
 			const overrideDates: DateTime[] = [];
 
-			// Find overrides that match the section's schedule and add exclusions/events
+			// Add exclusions
 			for (const override of overrides) {
 				// Overrides with no schedule are just for adding events
 				if (override.schedule === undefined) continue;
 
+				// Exclusion is not needed if the override is outside the section's date range
 				if (
 					override.date < section.start.startOf("day") ||
 					override.date > section.lastDate.endOf("day")
@@ -132,8 +133,15 @@ export class Schedule {
 					continue;
 				}
 
-				overrideDates.push(override.date.startOf("day"));
+				overrideDates.push(
+					section.start.set({
+						day: override.date.day,
+						month: override.date.month,
+						year: override.date.year,
+					}),
+				);
 
+				if (override.schedule === undefined) continue;
 				if (override.schedule === "None") continue;
 
 				// Explanation for below:
