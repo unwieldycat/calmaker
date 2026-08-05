@@ -33,7 +33,7 @@ export function IndexPage() {
 	const [step, setStep] = useState<number>(1);
 	const [icsData, setIcsData] = useState<string>("");
 	const [selectedOverrideSet, setSelectedOverrideSet] =
-		useState<string>("default");
+		useState<string>("2026-2027 Calendar");
 
 	useEffect(() => {
 		if (icsData.length > 0) {
