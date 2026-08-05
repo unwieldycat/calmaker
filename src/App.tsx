@@ -10,7 +10,7 @@ export function App() {
 					<p>This tool is not officially endorsed by WPI</p>
 				</div>
 				<div className={styles.footerRow}>
-					<p>© 2025 Thurston A Yates</p>
+					<p>© {new Date().getFullYear()} Thurston A Yates</p>
 					<p> • </p>
 					<a href="https://github.com/unwieldycat/calmaker">View Source</a>
 				</div>
