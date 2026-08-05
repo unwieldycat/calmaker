@@ -46,6 +46,7 @@ export interface ScheduleOverride {
 	date: DateTime;
 	schedule?: string;
 	name?: string;
+	description?: string;
 }
 
 export class Schedule {
@@ -92,6 +93,7 @@ export class Schedule {
 
 			generatedCalendar.createEvent({
 				summary: override.name,
+				description: override.description,
 				timezone: "America/New_York",
 				start: override.date.startOf("day"),
 				allDay: true,
@@ -149,7 +151,10 @@ export class Schedule {
 				// EXDATE must match an actual generated occurrence. If the override day
 				// doesn't align with this section's recurrence weekdays, excluding this
 				// timestamp has no effect and can fail to suppress the intended class.
-				if (section.days && !section.days.includes(overrideDate.weekday as Weekdays))
+				if (
+					section.days &&
+					!section.days.includes(overrideDate.weekday as Weekdays)
+				)
 					continue;
 
 				overrideDates.push(overrideDate);
