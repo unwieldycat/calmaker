@@ -33,7 +33,8 @@
 			{ "date": "11-27-2026", "schedule": "None" },
 			{
 				"date": "12-07-2026",
-				"name": "Reading/Make-up day"
+				"name": "Reading/Make-up day",
+				"schedule": "None"
 			},
 			{
 				"date": "01-13-2027",
