@@ -1,8 +1,4 @@
-import ical, {
-	ICalCalendarMethod,
-	ICalEventRepeatingFreq,
-	ICalWeekday,
-} from "ical-generator";
+import ical, { ICalEventRepeatingFreq, ICalWeekday } from "ical-generator";
 import { DateTime } from "luxon";
 import { tzlib_get_ical_block } from "timezones-ical-library";
 
@@ -245,7 +241,7 @@ export class Schedule {
 					freq: ICalEventRepeatingFreq.DAILY,
 					byDay: weekdays,
 					until: section.lastDate,
-					exclude: overrideDates,
+					exclude: overrideDates.length > 0 ? overrideDates : undefined,
 				},
 			});
 		}
