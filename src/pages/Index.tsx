@@ -92,6 +92,7 @@ export function IndexPage() {
 				}),
 				schedule: override.schedule,
 				name: override.name,
+				description: override.description,
 			}),
 		);
 
