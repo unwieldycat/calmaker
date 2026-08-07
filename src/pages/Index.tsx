@@ -133,6 +133,39 @@ export function IndexPage() {
 		return ranges;
 	};
 
+	const getTermsWithScheduledSections = (
+		currentSchedule: Schedule,
+		calendarName: string,
+	): string[] => {
+		if (calendarName === "default") return [];
+
+		const calendar = academicCalendars.find((cal) => cal.name === calendarName);
+		if (!calendar) return [];
+
+		const sections = currentSchedule.getSections();
+		const selectedByDefault: string[] = [];
+
+		for (const term of termOptions) {
+			const termData = calendar.terms[term as keyof typeof calendar.terms];
+			if (!termData) continue;
+
+			const termStart = parseOverrideDate(termData.start).startOf("day");
+			const termEnd = parseOverrideDate(termData.end).endOf("day");
+
+			const hasEventsInTerm = sections.some((section) => {
+				const sectionStart = section.start.startOf("day");
+				const sectionEnd = section.lastDate.endOf("day");
+				return sectionStart <= termEnd && sectionEnd >= termStart;
+			});
+
+			if (hasEventsInTerm) {
+				selectedByDefault.push(term);
+			}
+		}
+
+		return selectedByDefault;
+	};
+
 	const isTermSelected = (term: string) => {
 		return selectedTerms.includes(term);
 	};
@@ -149,6 +182,17 @@ export function IndexPage() {
 		const nextTerms = [...selectedTerms, term];
 		setSelectedTerms(nextTerms);
 	};
+
+	useEffect(() => {
+		if (!schedule || selectedAcademicCalendar === "default") {
+			setSelectedTerms([]);
+			return;
+		}
+
+		setSelectedTerms(
+			getTermsWithScheduledSections(schedule, selectedAcademicCalendar),
+		);
+	}, [schedule, selectedAcademicCalendar]);
 
 	const generateFile = () => {
 		if (!schedule) return;
@@ -232,7 +276,6 @@ export function IndexPage() {
 							value={selectedAcademicCalendar}
 							onChange={(event) => {
 								setSelectedAcademicCalendar(event.target.value);
-								setSelectedTerms([]);
 							}}
 						>
 							<option value="2026-2027 Calendar">2026-2027 Calendar</option>
