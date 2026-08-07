@@ -238,7 +238,7 @@ export class Schedule {
 				start: section.start,
 				end: section.end,
 				repeating: {
-					freq: ICalEventRepeatingFreq.DAILY,
+					freq: ICalEventRepeatingFreq.WEEKLY,
 					byDay: weekdays,
 					until: section.lastDate,
 					exclude: overrideDates.length > 0 ? overrideDates : undefined,
