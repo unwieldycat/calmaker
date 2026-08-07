@@ -217,9 +217,7 @@ describe("parser", () => {
 
 			const sections = result[0].getSections();
 
-			expect(sections).toHaveLength(1);
-			expect(sections[0].name).toBe("PC 1000 LEC");
-			expect(sections[0].allDay).toBe(true);
+			expect(sections).toHaveLength(0);
 		});
 	});
 });
