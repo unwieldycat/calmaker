@@ -257,9 +257,7 @@ async function parseRow(
 		second: 0,
 	});
 
-	lastDate = lastDate
-		.set({ hour: endTime[0], minute: endTime[1], second: 0 })
-		.plus({ days: 1 });
+	lastDate = lastDate.plus({ days: 1 });
 
 	endDate.setZone("America/New_York");
 

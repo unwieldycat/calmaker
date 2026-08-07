@@ -144,16 +144,14 @@ export class Schedule {
 					{ zone: section.start.zone },
 				);
 
-				// EXDATE must match an actual generated occurrence. If the override day
-				// doesn't align with this section's recurrence weekdays, excluding this
-				// timestamp has no effect and can fail to suppress the intended class.
+				// Exclude only occurrences that would naturally happen on this
+				// calendar date for the section's base recurrence.
 				if (
 					section.days &&
-					!section.days.includes(overrideDate.weekday as Weekdays)
-				)
-					continue;
-
-				overrideDates.push(overrideDate);
+					section.days.includes(overrideDate.weekday as Weekdays)
+				) {
+					overrideDates.push(overrideDate);
+				}
 
 				if (override.schedule === undefined) continue;
 				if (override.schedule === "None") continue;
