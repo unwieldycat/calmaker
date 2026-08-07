@@ -1,13 +1,7 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { parseSheet } from "../lib/parser";
-import {
-	ArrowLeft,
-	ArrowRight,
-	Check,
-	Download,
-	HelpCircle,
-} from "feather-icons-react";
-import { Schedule } from "../lib/schedule";
+import { ArrowLeft, Check, Download, HelpCircle } from "feather-icons-react";
+import { DateRange, Schedule } from "../lib/schedule";
 import { Toast } from "../components/Toast/Toast";
 import { sheetToArray } from "../lib/sheet";
 import { Button } from "../components/Button/Button";
@@ -17,8 +11,9 @@ import { Dialog } from "../components/Dialog/Dialog";
 import { Link } from "../components/Link/Link";
 import { Select } from "../components/Select/Select";
 import { DateTime } from "luxon";
-import scheduleOverrides from "../schedules.json";
+import academicCalendars from "../schedules.json";
 import type { ScheduleOverride } from "../lib/schedule";
+import { LabelCheckbox } from "../components/LabelCheckbox/LabelCheckbox";
 
 enum DialogState {
 	ObtainingInfo,
@@ -27,13 +22,15 @@ enum DialogState {
 }
 
 export function IndexPage() {
+	const termOptions = ["A", "B", "C", "D", "E1", "E2"] as const;
 	const [showState, setShowState] = useState<DialogState>(DialogState.None);
 	const [schedule, setSchedule] = useState<Schedule | null>(null);
 	const [errors, setErrors] = useState<Error[]>([]);
 	const [step, setStep] = useState<number>(1);
 	const [icsData, setIcsData] = useState<string>("");
-	const [selectedOverrideSet, setSelectedOverrideSet] =
+	const [selectedAcademicCalendar, setSelectedAcademicCalendar] =
 		useState<string>("2026-2027 Calendar");
+	const [selectedTerms, setSelectedTerms] = useState<string[]>([]);
 
 	useEffect(() => {
 		if (icsData.length > 0) {
@@ -79,32 +76,86 @@ export function IndexPage() {
 	};
 
 	const loadOverrides = () => {
-		const overrideSet = scheduleOverrides.find(
-			(set) => set.name === selectedOverrideSet,
+		const calendar = academicCalendars.find(
+			(cal) => cal.name === selectedAcademicCalendar,
 		);
 
-		if (!overrideSet) return [];
+		if (!calendar) return [];
 
-		const overrides: ScheduleOverride[] = overrideSet.overrides.map(
+		const overrides: ScheduleOverride[] = calendar.overrides.map(
 			(override) => ({
+				...override,
 				date: DateTime.fromFormat(override.date, "MM-dd-yyyy", {
 					zone: "America/New_York",
 				}),
-				schedule: override.schedule,
-				name: override.name,
-				description: override.description,
 			}),
 		);
 
 		return overrides;
 	};
 
+	const parseOverrideDate = (dateString: string) => {
+		return DateTime.fromFormat(dateString, "MM-dd-yyyy", {
+			zone: "America/New_York",
+		});
+	};
+
+	const getTermRange = (term: string) => {
+		const calendar = academicCalendars.find(
+			(cal) => cal.name === selectedAcademicCalendar,
+		);
+
+		if (!calendar) return null;
+
+		if (!(term in calendar.terms)) {
+			console.error("Invalid term specified for term range: ", term);
+			return null;
+		}
+
+		const termData = calendar.terms[term as keyof typeof calendar.terms];
+		if (!termData) return null;
+
+		return {
+			start: parseOverrideDate(termData.start),
+			end: parseOverrideDate(termData.end),
+		};
+	};
+
+	const getSelectedRanges = (): DateRange[] => {
+		const ranges: DateRange[] = [];
+
+		for (const term of selectedTerms) {
+			const range = getTermRange(term);
+			if (!range) continue;
+			ranges.push(range);
+		}
+
+		return ranges;
+	};
+
+	const isTermSelected = (term: string) => {
+		return selectedTerms.includes(term);
+	};
+
+	const toggleTerm = (term: string) => {
+		const selected = isTermSelected(term);
+
+		if (selected) {
+			const nextTerms = selectedTerms.filter((entry) => entry !== term);
+			setSelectedTerms(nextTerms);
+			return;
+		}
+
+		const nextTerms = [...selectedTerms, term];
+		setSelectedTerms(nextTerms);
+	};
+
 	const generateFile = () => {
 		if (!schedule) return;
 
 		const overrides = loadOverrides();
-
-		const data = schedule.toICalendar(overrides);
+		const selectedRanges = getSelectedRanges();
+		const data = schedule.toICalendar(overrides, selectedRanges);
 		setIcsData(data);
 	};
 
@@ -178,12 +229,31 @@ export function IndexPage() {
 						<p>Apply modified schedule days from</p>
 
 						<Select
-							value={selectedOverrideSet}
-							onChange={(event) => setSelectedOverrideSet(event.target.value)}
+							value={selectedAcademicCalendar}
+							onChange={(event) => {
+								setSelectedAcademicCalendar(event.target.value);
+								setSelectedTerms([]);
+							}}
 						>
 							<option value="2026-2027 Calendar">2026-2027 Calendar</option>
 							<option value="default">Nothing. I'll do it myself</option>
 						</Select>
+
+						{selectedAcademicCalendar !== "default" && (
+							<>
+								<p>Include terms</p>
+								<div className={styles.checkboxes}>
+									{termOptions.map((term) => (
+										<LabelCheckbox
+											key={term}
+											label={term}
+											checked={isTermSelected(term)}
+											onChange={() => toggleTerm(term)}
+										/>
+									))}
+								</div>
+							</>
+						)}
 
 						<div className={styles.btnCluster}>
 							<Button

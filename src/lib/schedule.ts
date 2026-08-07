@@ -38,10 +38,27 @@ export interface Section {
 	lastDate: DateTime;
 }
 
+export interface DateRange {
+	start: DateTime;
+	end: DateTime;
+}
+
+export interface AcademicCalendar {
+	terms: {
+		A: DateRange;
+		B: DateRange;
+		C: DateRange;
+		D: DateRange;
+		E1: DateRange;
+		E2: DateRange;
+	};
+	overrides: ScheduleOverride[];
+}
+
 export interface ScheduleOverride {
 	date: DateTime;
 	schedule?: string;
-	name?: string;
+	name: string;
 	description?: string;
 }
 
@@ -75,7 +92,10 @@ export class Schedule {
 	 * Convert the schedule to an ICalendar object
 	 * @returns An ICS-formatted string
 	 */
-	toICalendar(overrides: ScheduleOverride[] = []): string {
+	toICalendar(
+		overrides: ScheduleOverride[] = [],
+		ranges?: DateRange[],
+	): string {
 		const generatedCalendar = ical();
 
 		generatedCalendar.timezone({
@@ -83,10 +103,41 @@ export class Schedule {
 			generator: (tz) => tzlib_get_ical_block(tz)[0],
 		});
 
-		// Create override events for each override with a name
-		for (const override of overrides) {
-			if (!override.name) continue;
+		const normalizedRanges = ranges?.map((range) => ({
+			start: range.start.startOf("day"),
+			end: range.end.endOf("day"),
+		}));
 
+		const isInSelectedRanges = (date: DateTime): boolean => {
+			if (!normalizedRanges || normalizedRanges.length === 0) return true;
+			return normalizedRanges.some(
+				(range) =>
+					date.startOf("day") >= range.start && date.endOf("day") <= range.end,
+			);
+		};
+
+		const sectionOverlapsSelection = (section: Section): boolean => {
+			if (!normalizedRanges || normalizedRanges.length === 0) return true;
+			const sectionStart = section.start.startOf("day");
+			const sectionEnd = section.lastDate.endOf("day");
+			return normalizedRanges.some(
+				(range) => sectionStart <= range.end && sectionEnd >= range.start,
+			);
+		};
+
+		const effectiveOverrides = overrides.filter((override) =>
+			isInSelectedRanges(override.date),
+		);
+
+		const latestSelectedEnd =
+			normalizedRanges && normalizedRanges.length > 0
+				? normalizedRanges.reduce(
+						(latest, range) => (range.end > latest ? range.end : latest),
+						normalizedRanges[0].end,
+					)
+				: undefined;
+
+		for (const override of effectiveOverrides) {
 			generatedCalendar.createEvent({
 				summary: override.name,
 				description: override.description,
@@ -97,6 +148,8 @@ export class Schedule {
 		}
 
 		for (const section of this._sections) {
+			if (!sectionOverlapsSelection(section)) continue;
+
 			if (!section.allDay && (!section.end || !section.days)) {
 				throw new Error(
 					"Invalid section: missing end date or days for a non all-day event",
@@ -119,7 +172,7 @@ export class Schedule {
 			const overrideDates: DateTime[] = [];
 
 			// Add exclusions
-			for (const override of overrides) {
+			for (const override of effectiveOverrides) {
 				// Overrides with no schedule are just for adding events
 				if (override.schedule === undefined) continue;
 
@@ -227,6 +280,11 @@ export class Schedule {
 				});
 			}
 
+			const repeatingUntil =
+				latestSelectedEnd && latestSelectedEnd < section.lastDate
+					? latestSelectedEnd
+					: section.lastDate;
+
 			generatedCalendar.createEvent({
 				summary: section.name,
 				description: section.description,
@@ -238,7 +296,7 @@ export class Schedule {
 				repeating: {
 					freq: ICalEventRepeatingFreq.WEEKLY,
 					byDay: weekdays,
-					until: section.lastDate,
+					until: repeatingUntil,
 					exclude: overrideDates.length > 0 ? overrideDates : undefined,
 				},
 			});

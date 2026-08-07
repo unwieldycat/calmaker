@@ -31,6 +31,7 @@ describe("schedule", () => {
 				}),
 				// Use Monday schedule so a replacement event is added on this date.
 				schedule: "M",
+				name: "Monday schedule",
 			},
 		]);
 
