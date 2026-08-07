@@ -117,12 +117,16 @@ export function IndexPage() {
 	return (
 		<>
 			<main className={styles.main}>
-				<h1>WPI Calendar Generator</h1>
+				{step === 1 && (
+					<>
+						<h1>WPI Calendar Generator</h1>
 
-				<p>
-					A quick tool to generate Outlook, Apple Calendar, or Google Calendar
-					events from your WPI Workday schedule.
-				</p>
+						<p>
+							A tool to generate Outlook, Apple Calendar, or Google Calendar
+							events from your WPI Workday schedule.
+						</p>
+					</>
+				)}
 
 				{errors.length > 0 && (
 					<Toast type="error">
@@ -204,6 +208,11 @@ export function IndexPage() {
 
 				{step == 3 && (
 					<>
+						<Toast type="warning">
+							Importing events to an Outlook account from an Apple Calendar
+							client may result in broken events. Import to your calendar
+							platform of choice using its native website or app.
+						</Toast>
 						<Toast type="info">
 							<p>
 								Bad output?{" "}
